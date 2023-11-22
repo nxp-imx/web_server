@@ -1,0 +1,135 @@
+/**
+# Copyright 2023 NXP
+# SPDX-License-Identifier: BSD-3-Clause   
+*/
+* {
+    padding: 0px;
+    margin: 0px;
+}
+
+#header {
+    width: auto;
+    height: 48px;
+    background-color: #07151b;
+}
+
+#return_button {
+    height: 48px;
+    float: left;
+    color: aliceblue;
+    line-height: 48px;
+    margin-left: 15px;
+    cursor: pointer;
+}
+
+#nxp_logo {
+    float: right;
+    height: 48px;
+}
+
+.container {
+    width: 100vw;
+    height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-form {
+    width: 240px;
+    /* height: 220px; */
+    display: flex;
+    flex-direction: column;
+    padding: 40px;
+    padding-bottom: 60px;
+    text-align: center;
+    position: relative;
+    z-index: 100;
+    background: inherit;
+    border-radius: 18px;
+    overflow: hidden;
+    background-color: rgba(7, 21, 27);
+}
+
+.login-form h2 {
+    font-size: 25px;
+    font-weight: 400;
+    color: #3d5245;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.login-form input,
+.login-form button,
+.login-form select {
+    margin: 6px 0;
+    height: 36px;
+    border: none;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    padding: 0 14px;
+    color: #3d5245;
+}
+
+.login-form input::placeholder {
+    color: #3d5245;
+}
+
+.login-form button:focus,
+.login-form input:focus {
+    outline: 0;
+}
+
+.login-form button {
+    margin-top: 24px;
+    background-color: rgba(255, 255, 255, 0.4);
+    color: white;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: 0.4s;
+    font-size: 15px;
+}
+
+.login-form button:hover {
+    background-color: rgba(12, 80, 38, 0.67);
+}
+
+#select_wifi_name {
+    color: aliceblue;
+    font-weight: 400;
+    font-size: 15px;
+    appearance: none;
+    background: url(../img/icons/arrow-down.png) no-repeat scroll right center transparent;
+    background-size: 10px;
+    background-color: rgba(255, 255, 255, 0.4);
+    background-position-x: 95%;
+}
+
+option {
+    color: black;
+}
+
+#wifipwd {
+    color: aliceblue;
+    font-weight: 400;
+    font-size: 15px;
+}
+
+input::-webkit-input-placeholder {
+    color: aliceblue !important;
+}
+
+#wifiicon {
+    font-size: 24px;
+}
+
+#connect_button {
+    background-color: green;
+    width: 100px;
+    padding: 0;
+}
+
+#connect_button:hover {
+    background-color: rgba(12, 80, 38, 0.67);
+}

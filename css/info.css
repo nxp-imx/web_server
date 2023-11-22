@@ -1,0 +1,175 @@
+/**
+# Copyright 2023 NXP
+# SPDX-License-Identifier: BSD-3-Clause   
+*/
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@media screen and (min-width: 801px) {
+    * {
+        margin: 0;
+        padding: 0;
+    }
+    body {
+        font-family: 'Poppins', sans-serif;
+    }
+    #header {
+        position: fixed;
+        background-color: #07151b;
+        width: 100vw;
+        height: 48px;
+        z-index: 20000;
+    }
+    #return_button {
+        height: 48px;
+        float: left;
+        color: aliceblue;
+        line-height: 48px;
+        margin-left: 15px;
+        cursor: pointer;
+    }
+    #icon-fanhui {
+        font-size: 20px;
+    }
+    #nxp_logo {
+        float: right;
+    }
+    #board-name {
+        margin-top: 6vh;
+        width: 100vw;
+        height: 6vh;
+        display: inline-block;
+        text-align: center;
+        font-size: 40px;
+        font-weight: bold;
+        color: white;
+    }
+    #board-name-line2 {
+        font-size: 25px;
+    }
+    .box {
+        background-color: rgba(216, 211, 211);
+        border-radius: 1vw;
+        width: 40vw;
+        margin: 0px auto;
+        text-align: center;
+    }
+    #box1 {
+        width: 35vw;
+        height: 33vh;
+        float: left;
+        margin: 0 5vw;
+        text-align: left;
+        margin-top: 5vh;
+    }
+    #box2 {
+        width: 35vw;
+        height: 33vh;
+        float: left;
+        margin: 0 5vw;
+        margin-top: 5vh;
+    }
+    #box3 {
+        width: 50vw;
+        height: 33vh;
+        float: left;
+        margin-top: 5vh;
+    }
+    #box4 {
+        width: 50vw;
+        height: 33vh;
+        float: left;
+        margin-top: 5vh;
+    }
+    .box-title {
+        padding: 10px;
+        color: black;
+        font-weight: bold;
+        font-size: 25px;
+        text-align: center;
+    }
+    #list1 {
+        padding: 0px 40px;
+    }
+    .chart {
+        background-color: transparent;
+        display: inline-block;
+        width: 22vw;
+        height: 28vh;
+    }
+    #chart-ram {
+        width: 30vw;
+    }
+    #chart-temper,
+    #chart-acc {
+        height: 25vh;
+    }
+}
+
+@media screen and (max-width: 800px) {
+    * {
+        margin: 0;
+        padding: 0;
+    }
+    body {
+        font-family: 'Poppins', sans-serif;
+    }
+    #header {
+        position: fixed;
+        background-color: #07151b;
+        width: 100vw;
+        height: 6vh;
+        z-index: 20000;
+    }
+    #return_button {
+        height: 48px;
+        float: left;
+        color: aliceblue;
+        line-height: 48px;
+        margin-left: 15px;
+        cursor: pointer;
+    }
+    #icon-fanhui {
+        font-size: 20px;
+    }
+    #nxp_logo {
+        float: right;
+    }
+    #board-name {
+        margin-top: 6vh;
+        width: 100vw;
+        height: 6vh;
+        display: inline-block;
+        text-align: center;
+        font-size: 40px;
+        font-weight: bold;
+        color: white;
+    }
+    #board-name-line2 {
+        font-size: 25px;
+    }
+    .box {
+        background-color: rgba(216, 211, 211, 0.8);
+        border-radius: 3vw;
+        width: 80vw;
+        margin: 4vh auto;
+        text-align: center;
+    }
+    #box1 {
+        text-align: left;
+    }
+    .box-title {
+        padding: 10px;
+        color: black;
+        font-weight: bold;
+        font-size: 25px;
+        text-align: center;
+    }
+    #list1 {
+        padding: 0px 25px 10px 25px;
+    }
+    .chart {
+        background-color: transparent;
+        width: 77vw;
+        height: 25vh;
+        display: inline-block;
+    }
+}

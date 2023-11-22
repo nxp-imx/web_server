@@ -1,0 +1,37 @@
+--------------------------------------------
+
+Package:                   i.MX8DXL web_server release
+Version:                   v1.0
+Date:                      December 2023
+Outgoing License:          LA_OPT_NXP_Software_License v49 Sep 2023 - Additional distribution license granted - Section 2.3 applies
+License File:              LICENSE.txt
+Type of content:           Source code
+Description and comments:  Web UI for OrangeBox
+Release Location:          https://github.com/nxp-imx/web_server.git
+Origin:                    NXP
+
+--------------------------------------------
+file    :                    echarts.min.js
+Outgoing License:            Apache License, Version 2.0
+License File:                LICENSE.APACHE
+Package Category:            echarts.min.js
+Type of Content:             source
+Release Location:            https://github.com/nxp-imx/web_server/lib/echarts.min.js
+Origin:                      https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js
+--------------------------------------------
+file    :                    jquery-3.7.0.js
+Outgoing License:            MIT license
+License File:                LICENSE.MIT
+Package Category:            jquery-3.7.0.js
+Type of Content:             source
+Release Location:            https://github.com/nxp-imx/web_server/lib/jquery-3.7.0.js
+Origin:                      https://jquery.com
+--------------------------------------------
+file    :                    font.js
+Outgoing License:            Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License
+License File:                LICENSE.FONT,LICENSE.MIT
+Package Category:            font.js
+Type of Content:             source
+Release Location:            https://github.com/nxp-imx/web_server/lib/font.js
+Origin:                      https://fontawesome.com
+--------------------------------------------

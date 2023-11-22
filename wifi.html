@@ -1,0 +1,183 @@
+<!--
+# Copyright 2023 NXP
+# SPDX-License-Identifier: BSD-3-Clause   
+-->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <script src="./lib/jquery-3.7.0.js"></script>
+    <script src="./js/functions.js"></script>
+    <link rel="stylesheet" href="./css/wifi.css" />
+    <link rel="stylesheet" href="https://at.alicdn.com/t/c/font_4130672_sfajzlx1cq.css">
+    <link rel="shortcut icon" href="img/icons/title-nxp.ico" type="image/x-icon">
+    <title>WIFI Connector</title>
+
+    <style>
+        body {
+            background-image: url(./img/pictures/wifi.jpg);
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+        }
+    </style>
+
+    <style media="screen">
+        .loading {
+            position: relative;
+            top: 28px;
+            width: 40px;
+            perspective: 200px;
+            display: inline-block;
+            visibility: hidden;
+        }
+        
+        .loading:before,
+        .loading:after {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            content: "";
+            animation: jumping 0.5s infinite alternate;
+            background: rgba(255, 255, 255, 0);
+        }
+        
+        .loading:before {
+            left: 0;
+        }
+        
+        .loading:after {
+            right: 0;
+            animation-delay: 0.15s;
+        }
+        
+        @keyframes jumping {
+            0% {
+                transform: scale(1) translateY(0px) rotateX(0deg);
+                box-shadow: 0 0 0 rgba(255, 255, 255, 0);
+            }
+            100% {
+                transform: scale(1.2) translateY(-25px) rotateX(45deg);
+                background: #ffffff;
+                box-shadow: 0 25px 40px #ffffff;
+            }
+        }
+    </style>
+</head>
+<!-- =============================================================================================== -->
+
+<body>
+    <div id="header">
+        <div id="return_button" class="refer">
+            <a class="icon-fanhui iconfont" onclick="window.location.href='./index.html'"></a>
+        </div>
+        <div id="nxp_logo">
+            <img src="./img/icons/nxp_logo.png" style="height: 48px;" />
+        </div>
+    </div>
+
+    <div class="container">
+        <form class="login-form">
+            <div>
+                <a id="wifiicon" class="icon-wifi iconfont" style=" color:aliceblue;"></a>
+            </div>
+            <h2 style=" color:aliceblue;font-weight:bold; ">WIFI Connector</h2>
+            <select id="select_wifi_name">
+                <option>choose your wifi</option>
+            </select>
+            <input id="wifipwd" type="password" placeholder="password">
+            <p>
+                <span><button type="button"  value="scan" onclick="scan_wifi() " style="color:aliceblue;font-weight:bold; width:100px;padding:0  ">scan</button></span>
+                <!-- <span><button type="button"  value="show" onclick="show_wifi() " style="color:aliceblue;font-weight:bold; ">show</button></span> -->
+                <span><button type="button"  id='connect_button' value="Connect" onclick="connect_wifi(document.getElementById( 'select_wifi_name').children[Number(document.getElementById( 'select_wifi_name').value)+1].innerText,document.getElementById( 'wifipwd').value)
+                " style="color:aliceblue;font-weight:bold;">connect</button></span>
+            </p>
+            <div class="loading" id="loading" style="align-self: center;"> </div>
+        </form>
+    </div>
+    <!-- =============================================================================================== -->
+    <script>
+        function scan_wifi() {
+            $(loading).css("visibility", "visible");
+            $.ajax({
+                type: "GET",
+                url: "./php/scan_v2.php",
+                async: true,
+                dataType: "json",
+                success: function(data) {
+                    /*get raw_info*/
+                    var wifi_info_string = data; 
+
+                    var wifi_list = proc_wifi_data(wifi_info_string);
+                    document.getElementById("select_wifi_name").length = 1;
+                    let com = document.getElementById("select_wifi_name");
+                    for (let i = 0; i < wifi_list.length; i++) {
+                        com.options.add(new Option(wifi_list[i], i));
+                    }
+                    /* Display over*/
+                    $(loading).css("visibility", "hidden"); 
+                }
+            });
+        }
+
+        function proc_wifi_data(wifi_info_string) {
+            var wifi_info_proc = []; 
+            wifi_info_proc.splice(0); 
+
+            for (var i = 0; i < wifi_info_string.length; i++) {
+                wifi_info_proc.push(wifi_info_string[i].trim());
+            }
+
+            for (var i = wifi_info_proc.length - 1; i >= 0; i--) {
+                if (wifi_info_proc[i].indexOf('*AR Wired') != -1) {
+                    wifi_info_proc.splice(i, 1);
+                }
+            }
+
+            var wifi_info_list = [];
+            for (var i = 0; i < wifi_info_proc.length; i++) {
+                wifi_info_list.push(wifi_info_proc[i].split("wifi_"));
+            }
+
+            for (var i = 0; i < wifi_info_list.length; i++) {
+                wifi_info_list[i][0] = wifi_info_list[i][0].replace(/(\s*$)/g, "");
+            }
+
+            var wifi_list = []; 
+            for (var i = 0; i < wifi_info_list.length; i++) {
+                if (wifi_list.indexOf(wifi_info_list[i][0]) == -1) {
+                    wifi_list.push(wifi_info_list[i][0]);
+                }
+            }
+
+            return wifi_list;
+        }
+
+        function connect_wifi(wifi_name, wifi_pwd) {
+            $(loading).css("visibility", "visible");
+            // alert("Please turn to the website:xx.xx.xx.101/web_server/index.html(xx.xx.xx is the network segment of your wlan. Check it on other devices.)");
+            $.ajax({
+                type: "GET",
+                url: "./php/wifi_connect.php?wifi_name=" + wifi_name + " &wifi_pwd=" + wifi_pwd,
+                async: true,
+                dataType: "json",
+                timeout: 8000, 
+                success: function(data) {
+                    $(loading).css("visibility", "hidden"); 
+                },
+                complete: function(XHR, TextStatus) {
+                    if (TextStatus == 'timeout') { 
+                        alert('Wait 10s until the page reconnect.\nOr swith to website XX.XX.XX.101.\n(XX.XX.XX is the network segment of your wlan.\n Check it on another device.)');
+                        $(loading).css("visibility", "hidden"); 
+                    }
+                }
+            });
+        }
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,432 @@
+<!--
+# Copyright 2023 NXP
+# SPDX-License-Identifier: BSD-3-Clause   
+-->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <script src="./lib/jquery-3.7.0.js"></script>
+    <script src="./js/functions.js"></script>
+    <link rel="stylesheet" href="./css/bt.css" />
+    <link rel="stylesheet" href="https://at.alicdn.com/t/c/font_4130672_sfajzlx1cq.css">
+    <link rel="shortcut icon" href="img/icons/title-nxp.ico" type="image/x-icon">
+
+    <title>Bluetooth Connector</title>
+
+    <style>
+        body {
+            background-image: url(./img/pictures/wifi.jpg);
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+            overflow: hidden;
+        }
+    </style>
+
+    <style media="screen">
+        .loading {
+            position: relative;
+            top: 28px;
+            width: 40px;
+            perspective: 200px;
+            display: inline-block;
+            visibility: hidden;
+        }
+        
+        .loading:before,
+        .loading:after {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            content: "";
+            animation: jumping 0.5s infinite alternate;
+            background: rgba(255, 255, 255, 0);
+        }
+        
+        .loading:before {
+            left: 0;
+        }
+        
+        .loading:after {
+            right: 0;
+            animation-delay: 0.15s;
+        }
+        
+        @keyframes jumping {
+            0% {
+                transform: scale(1) translateY(0px) rotateX(0deg);
+                box-shadow: 0 0 0 rgba(255, 255, 255, 0);
+            }
+            100% {
+                transform: scale(1.2) translateY(-25px) rotateX(45deg);
+                background: #ffffff;
+                box-shadow: 0 25px 40px #ffffff;
+            }
+        }
+    </style>
+</head>
+<!-- =============================================================================================== -->
+
+<body>
+    <div id="header">
+        <div id="return_button" class="refer">
+            <a class="icon-fanhui iconfont" onclick="window.location.href='./index.html'"></a>
+        </div>
+        <div id="nxp_logo">
+            <img src="./img/icons/nxp_logo.png" style="height: 48px;" />
+        </div>
+    </div>
+    <div class="container">
+        <form class="login-form" id="status1">
+            <div>
+                <img src="img/icons/bluetooth.png" alt="bticon" id="bticon">
+            </div>
+            <h2 style="color:aliceblue;font-weight:bold; ">Bluetooth Connector</h2>
+            <select id="select_bt_name">
+                    <option>choose your device</option>
+                </select>
+            <div class="button-array">
+                <div><span class="button-name">Power</span>
+                    <label class="switch">
+                                <input type="checkbox" class="checkbox" id="check-power">
+                                <div class="slider round"></div>
+                        </label>
+                </div>
+                <div><span class="button-name">Discoverable</span>
+                    <label class="switch">
+                                <input type="checkbox" class="checkbox" id="check-discoverable">
+                                <div class="slider round"></div>
+                        </label>
+                </div>
+            </div>
+            <p>
+                <span><button type="button"  value="Scan" onclick="scan_bt()" style="color:aliceblue;font-weight:bold;width:100px;padding:0  ">scan</button></span>
+                <!-- <span><button type="button"  value="Remove" onclick="remove_bt()" style="color:aliceblue;font-weight:bold; ">remove</button></span> -->
+                <span><button id="connect_button" type="button"  value="Connect" onclick="connect_bt()" style="color:aliceblue;font-weight:bold;width:100px;padding:0  ">connect</button></span>
+            </p>
+            <div class="loading" id="loading" style="align-self: center; height:60px;"> </div>
+            <!-- <div style="color:#ffffff;padding-bottom:10px">This is a command line</div> -->
+        </form>
+
+        <form class="login-form" id="status2">
+            <div>
+                <img src="img/icons/bluetooth.png" alt="bticon" id="bticon">
+            </div>
+            <h2 style="color:aliceblue;font-weight:bold; ">Bluetooth Info</h2>
+            <div class="bt-info-list-2" id="bt-info-list-2">
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+            </div>
+            <p>
+                <span><button type="button" value="unpair" onclick="bt_unpair_2()" style="color:aliceblue;font-weight:bold;width:100px;padding:0 ">unpair</button></span>
+                <span><button id="connect_button_2" type="button" value="connect" onclick="bt_connect_2()" style="color:aliceblue;font-weight:bold;width:100px;padding:0 ">connect</button></span>
+            </p>
+
+        </form>
+
+        <form class="login-form" id="status3">
+            <div>
+                <img src="img/icons/bluetooth.png" alt="bticon" id="bticon">
+            </div>
+            <h2 style="color:aliceblue;font-weight:bold; ">Bluetooth Info</h2>
+            <div class="bt-info-list-3" id="bt-info-list-3">
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+            </div>
+            <p>
+                <span><button type="button" value="disconnect" onclick="bt_disconnect_3()" style="color:aliceblue;font-weight:bold;width:100px;padding:0 ">disconnect</button></span>
+                <span><button type="button" value="unpair" onclick="bt_unpair_3()" style="color:aliceblue;font-weight:bold;width:100px;padding:0 ">unpair</button></span>
+            </p>
+        </form>
+    </div>
+
+    <!-- =============================================================================================== -->
+    <script>
+        var status;
+        var btshow;
+        var btinfo; //bluetooth show infomation
+        var bt_status = 0;
+
+        bt_init();
+
+        check_status();
+
+        if (status == 'status 1') {
+            document.getElementById('status1').style.display = 'flex';
+            document.getElementById('status2').style.display = 'none';
+            document.getElementById('status3').style.display = 'none';
+
+            var raw_info; // Raw data after scanning
+            var bt_list = new Map();
+            var checkbox_power = document.getElementById('check-power');
+            var checkbox_discoverable = document.getElementById('check-discoverable');
+
+
+            check_checkbox_status();
+
+            setInterval(function() {
+                bt_init();
+                check_checkbox_status();
+            }, 5000);
+
+            checkbox_power.addEventListener('change', (event) => {
+                if (document.getElementById('check-power').checked == true) {
+                    general_commands('bluetoothctl power on');
+                } else {
+                    general_commands('bluetoothctl power off');
+                }
+            });
+
+            checkbox_discoverable.addEventListener('change', (event) => {
+                if (document.getElementById('check-discoverable').checked == true) {
+                    general_commands('bluetoothctl discoverable on');
+                } else {
+                    general_commands('bluetoothctl discoverable off');
+                }
+            });
+
+        } else if (status == 'status 2') {
+            document.getElementById('status1').style.display = 'none';
+            document.getElementById('status2').style.display = 'flex';
+            document.getElementById('status3').style.display = 'none';
+
+            $.ajax({
+                type: "GET",
+                url: "./php/bt_connection_info.php",
+                async: false,
+                dataType: "json",
+                success: function(data) {
+                    console.log(data);
+                    for (let num = 0; num < data.length; num++) {
+                        document.getElementById('bt-info-list-2').children[num].innerHTML = data[num];
+                    }
+                }
+            });
+        } else if (status == 'status 3') {
+            document.getElementById('status1').style.display = 'none';
+            document.getElementById('status2').style.display = 'none';
+            document.getElementById('status3').style.display = 'flex';
+
+            $.ajax({
+                type: "GET",
+                url: "./php/bt_connection_info.php",
+                async: false,
+                dataType: "json",
+                success: function(data) {
+                    console.log(data);
+                    for (let num = 0; num < data.length; num++) {
+                        document.getElementById('bt-info-list-3').children[num].innerHTML = data[num];
+                    }
+                }
+            });
+        } else {
+            console.log('error');
+        }
+
+        //Scan bluetooth devices, results will be stored in array varieable "raw_info".
+        function scan_bt() {
+            $(loading).css("visibility", "visible");
+
+            $.ajax({
+                type: "GET",
+                url: "./php/bluetooth.php",
+                async: true,
+                dataType: "json",
+                success: function(data) {
+                    raw_info = data; 
+
+                    bt_data_proc(raw_info); 
+                    bt_add_list(bt_list); 
+
+                    $(loading).css("visibility", "hidden"); 
+                }
+            });
+        }
+
+        function remove_bt() {
+            var bt_id = Array.from(bt_list.keys())[document.getElementById('select_bt_name').value] //用于选择当前下拉框选中的元素的bluetooth id
+
+            $.ajax({
+                type: "GET",
+                url: "./php/general_commands.php?command=bluetoothctl remove " + bt_id,
+                async: true,
+                dataType: "json",
+                success: function(data) {
+                    console.log(data);
+                }
+            });
+        }
+
+        function connect_bt() {
+            var bt_id = Array.from(bt_list.keys())[document.getElementById('select_bt_name').value] //用于选择当前下拉框选中的元素的bluetooth id
+            $.ajax({
+                type: "GET",
+                url: "./php/bt_connect.php?bt_id=" + bt_id,
+                async: false,
+                dataType: "json",
+                success: function(data) {
+
+                }
+            });
+            
+            status = 'status 3';
+            location.reload();
+        }
+
+        function bt_data_proc(rawdata) {
+            for (var i = 0; i < raw_info.length; i++) {
+                bt_list.set(raw_info[i].slice((raw_info[i].search('Device') + 7), (raw_info[i].search('Device')) + 7 + 17), raw_info[i].slice((raw_info[i].search('Device') + 7 + 17 + 1), (raw_info[i].search('Device')) + 7 + 17 + 1 + 17))
+            }
+        }
+
+        function bt_add_list(list) {
+            document.getElementById('select_bt_name').length = 1; 
+
+            for (let i = 0; i < bt_list.size; i++) {
+                $("#select_bt_name").append(new Option(Array.from(bt_list.values())[i], i)); //二维数组中的第二列，即名称
+            }
+        }
+
+        function bt_init() {
+
+            if (bt_status == 0) {
+                console.log("BT started0.");
+                $.ajax({
+                    type: "GET",
+                    url: "./php/general_commands.php?command=sh /www/pages/web_server/sh/bt_init.sh",
+                    async: false,
+                    dataType: "json",
+                    success: function(data) {}
+                });
+                $.ajax({
+                    type: "GET",
+                    url: "./php/general_commands.php?command=bluetoothctl show",
+                    async: false,
+                    dataType: "json",
+                    success: function(data) {
+                        btinfo = data;
+                    }
+                });
+                bt_status=1;
+            } else {
+                btinfo = btshow;
+
+            }
+        }
+
+        function check_status() {
+            $.ajax({
+                type: "GET",
+                url: "./php/general_commands.php?command=sh ../sh/bt_status.sh",
+                async: false,
+                dataType: "json",
+                success: function(data) {
+                    status = data[0];
+                    console.log(data);
+                }
+            });
+        }
+
+        function check_checkbox_status() {
+
+            //Check status and change the input
+            if (btinfo[4].replace('\tPowered: ', '') == 'yes') {
+                document.getElementById('check-power').checked = true;
+            } else {
+                document.getElementById('check-power').checked = false;
+            }
+
+            if (btinfo[5].replace('\tDiscoverable: ', '') == 'yes') {
+                document.getElementById('check-discoverable').checked = true;
+            } else {
+                document.getElementById('check-discoverable').checked = false;
+            }
+        }
+
+        function bt_unpair_2() {
+            var dev_id = document.getElementById('bt-info-list-2').children[0].innerHTML.slice(7, 24);
+
+            $.ajax({
+                type: "GET",
+                url: "./php/general_commands.php?command=bluetoothctl remove " + dev_id,
+                async: false,
+                dataType: "json",
+                success: function(data) {
+                    console.log(data);
+                    location.reload();
+                }
+            });
+        }
+
+        function bt_connect_2() {
+            var dev_id = document.getElementById('bt-info-list-2').children[0].innerHTML.slice(7, 24);
+
+            $.ajax({
+                type: "GET",
+                url: "./php/general_commands.php?command=bluetoothctl connect " + dev_id,
+                async: false,
+                dataType: "json",
+                success: function(data) {
+                    console.log(data);
+                    location.reload();
+                }
+            });
+        }
+
+
+        function bt_unpair_3() {
+            var dev_id = document.getElementById('bt-info-list-3').children[0].innerHTML.slice(7, 24);
+
+            $.ajax({
+                type: "GET",
+                url: "./php/general_commands.php?command=bluetoothctl remove " + dev_id,
+                async: false,
+                dataType: "json",
+                success: function(data) {
+                    console.log(data);
+                    location.reload();
+                }
+            });
+        }
+
+        function bt_disconnect_3() {
+            var dev_id = document.getElementById('bt-info-list-3').children[0].innerHTML.slice(7, 24);
+
+            $.ajax({
+                type: "GET",
+                url: "./php/general_commands.php?command=bluetoothctl disconnect " + dev_id,
+                async: false,
+                dataType: "json",
+                success: function(data) {
+                    console.log(data);
+                    location.reload();
+                }
+            });
+        }
+    </script>
+
+</body>
+
+</html>

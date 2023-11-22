@@ -1,0 +1,375 @@
+<!--
+# Copyright 2023 NXP
+# SPDX-License-Identifier: BSD-3-Clause   
+-->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='UTF-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <script src="./lib/jquery-3.7.0.js"></script>
+    <script src="./lib/echarts.min.js"></script>
+    <script src="./js/setAxis.js"></script>
+    <script src="./js/functions.js"></script>
+    <script src="lib/font.js" crossorigin="anonymous"></script>
+    <link rel="shortcut icon" href="img/icons/title-nxp.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="https://at.alicdn.com/t/c/font_4130672_sfajzlx1cq.css">
+    <link rel="stylesheet" href="css/info.css">
+    <style>
+        body {
+            background-image: url(./img/pictures/wifi.jpg);
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+        }
+    </style>
+
+    <title>Info</title>
+
+</head>
+
+<body>
+    <div id="header">
+        <div id="return_button">
+            <a id="icon-fanhui" class="icon-fanhui iconfont" onclick="window.location.href='index.html'"></a>
+        </div>
+        <div id="nxp_logo">
+            <img src="img/icons/nxp_logo.png" style="height: 48px;" />
+        </div>
+    </div>
+    <div id="board-name">
+        <p>OrangeBox</p>
+        <p id="board-name-line2">Board Information</p>
+    </div>
+    <div class="charts-container">
+        <div id="box1" class="box">
+            <div id="box1-title" class="box-title">Basic Infomation</div>
+            <div id="list1">
+                <li id="cpucores">CPU(s) : </li>
+                <li id="Modelname">Model name :</li>
+                <li id="cpufreq1">CPU1 freq :</li>
+                <li id="cpufreq2">CPU2 freq :</li>
+                <li id="MemTotal">Mem Total :</li>
+                <li id="MemFree">Mem Free:</li>
+                <li id="MemAvailable">Mem Available :</li>
+                <li id="Buffers">Buffers :</li>
+            </div>
+        </div>
+        <div id="box3" class="box">
+            <div id="box3-title" class="box-title">CPU Usage</div>
+            <div id="chart-cpu0" class="chart"></div>
+            <div id="chart-cpu1" class="chart"></div>
+        </div>
+        <div id="box2" class="box">
+            <div id="box2-title" class="box-title">RAM Usage</div>
+            <div id="chart-ram" class="chart"></div>
+        </div>
+
+
+        <div id="box4" class="box">
+            <div id="box4-title" class="box-title">Sensors Info</div>
+            <div id="chart-temper" class="chart"></div>
+            <div id="chart-acc" class="chart"></div>
+        </div>
+    </div>
+
+
+    <script>
+        var cpu_now = [
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        ];
+        var cpu_sum = [0, 0];
+        var cpu_delta = [0, 0];
+        var cpu_idle = [0, 0];
+        var cpu_used = [0, 0];
+        var cpu_usage = [0, 0, 0, 0];
+        var cpu_last = [
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        ];
+        var cpu_last_sum = [0, 0];
+        var single_cpu_data;
+        refresh_list();
+        //init every chart
+        var myChart_ram = echarts.init(document.getElementById('chart-ram'), null, {
+            renderer: 'canvas',
+            useDirtyRect: false
+        });
+        var myChart_cpu0 = echarts.init(document.getElementById('chart-cpu0'), null, {
+            renderer: 'canvas',
+            useDirtyRect: false
+        });
+        var myChart_cpu1 = echarts.init(document.getElementById('chart-cpu1'), null, {
+            renderer: 'canvas',
+            useDirtyRect: false
+        });
+        var myChart_temper = echarts.init(document.getElementById("chart-temper"));
+        var myChart_acc = echarts.init(document.getElementById('chart-acc'));
+        //define chart's option
+        var option_line = {
+            color: '#fcb316',
+            backgroundColor: 'rgba(0,0,0,0)',
+            tooltip: {
+                trigger: 'axis' 
+            },
+            calculable: true, 
+           
+            xAxis: [{
+                type: 'category', 
+                boundaryGap: false, 
+                axisLine: {
+                    lineStyle: {
+                        type: 'solid', 
+                        color: '#000000', 
+                        width: '4' 
+                    }
+                },
+                axisLabel: {
+                    textStyle: {
+                        color: '#000000' 
+                    }
+                },
+                spiltLine: {
+                    show: true,
+                    lineStyle: {
+                        color: ['#000000'] 
+                    }
+                },
+                data: xdata 
+            }],
+        
+            yAxis: [{
+                type: 'value', 
+                max: 100, 
+                min: 0, 
+                axisLabel: { 
+                    formatter: '{value} %', 
+                    textStyle: {
+                        color: '#000000' 
+                    }
+                },
+                axisLine: {
+                    lineStyle: {
+                        type: 'solid',
+                        color: '#000000', 
+                        width: '4' 
+                    }
+                },
+                spiltLine: {
+                    show: true, 
+                    lineStyle: {
+                        color: ['#000000']
+                    }
+                }
+            }],
+            grid: {
+                top: '20%',
+                bottom: '15%',
+                left: '15%'
+            },
+            series: [{
+                data: y0data,
+                type: "line",
+                areaStyle: {
+                    color: { 
+                        type: 'linear',
+                        x: 0,
+                        y: 0,
+                        x2: 0,
+                        y2: 1,
+                        colorStops: [{
+                            offset: 0,
+                            color: '#fcb316' 
+                        }, {
+                            offset: 1,
+                            color: 'white' 
+                        }],
+                        global: false // default is false
+                    }
+                },
+            }]
+        };
+
+        const gaugeData = [{
+            value: 5200,
+            name: 'Team Label 1',
+            title: {
+                offsetCenter: ['0%', '-30%']
+            },
+            detail: {
+                valueAnimation: true,
+                offsetCenter: ['0%', '-20%']
+            }
+        }];
+
+        const option_temper = {
+            series: [{
+                type: 'gauge',
+                center: ['50%', '75%'],
+                startAngle: 200,
+                endAngle: -20,
+                min: 0,
+                max: 100,
+                splitNumber: 10,
+                itemStyle: {
+                    color: '#7FFF00'
+                },
+                progress: {
+                    show: true,
+                    width: 25
+                },
+                pointer: {
+                    show: false
+                },
+                axisLine: {
+                    lineStyle: {
+                        width: 25
+                    }
+                },
+                axisTick: {
+                    distance: -45,
+                    splitNumber: 5,
+                    lineStyle: {
+                        width: 2,
+                        color: 'rgba(0, 0, 0, 0.8)'
+                    }
+                },
+                splitLine: {
+                    distance: -52,
+                    length: 14,
+                    lineStyle: {
+                        width: 3,
+                        color: 'rgba(0, 0, 0, 0.8)'
+                    }
+                },
+                axisLabel: {
+                    distance: -10,
+                    color: 'rgba(0, 0, 0, 0.8)',
+                    fontSize: 15
+                },
+                anchor: {
+                    show: false
+                },
+                detail: {
+                    valueAnimation: true,
+                    width: '60%',
+                    lineHeight: 40,
+                    borderRadius: 8,
+                    offsetCenter: [0, '-15%'],
+                    fontSize: 20,
+                    fontWeight: 'bolder',
+                    formatter: '{value} °C',
+                    color: 'auto',
+                },
+                data: [{
+                    value: 0
+                }]
+            }]
+        };
+
+        var option_acc = {
+            title: {
+                text: "Accelerator",
+                textStyle: {
+                    color: '#000000'
+                },
+                left: 186
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                }
+            },
+
+            xAxis: {
+                type: 'value',
+                position: 'top',
+                max: 1000,
+                min: -1000,
+                splitLine: {
+                    lineStyle: {
+                        type: 'solid',
+                        color: '#FFF'
+                    }
+                },
+                axisLabel: {
+                    color: "rgba(0, 0, 0, 1)"
+                }
+            },
+            yAxis: {
+                type: 'category',
+                axisLine: {
+                    show: false
+                },
+                axisLabel: {
+                    show: false
+                },
+                axisTick: {
+                    show: false
+                },
+                splitLine: {
+                    show: false
+                },
+                data: [
+                    'z',
+                    'y',
+                    'x'
+                ],
+
+            },
+            grid: {
+                bottom: '1%'
+            },
+            series: [{
+                type: 'bar',
+                stack: 'Total',
+                label: {
+                    show: true,
+                    formatter: '{b} : {c}',
+                    position: 'right',
+                    fontSize: 20
+                },
+                data: [{
+                    value: 0,
+                    itemStyle: {
+                        color: '#c9d200'
+                    }
+                }, {
+                    value: 0,
+                    itemStyle: {
+                        color: '#7bb1db'
+                    }
+                }, {
+                    value: 0,
+                    itemStyle: {
+                        color: "#ffb500"
+                    }
+                }, ],
+                barWidth: 30,
+                barGap: 50,
+                itemStyle: {
+                    borderRadius: 10
+                }
+            }]
+        };
+
+        myChart_ram.setOption(option_line);
+        myChart_cpu0.setOption(option_line);
+        myChart_cpu1.setOption(option_line);
+        myChart_temper.setOption(option_temper);
+        myChart_acc.setOption(option_acc);
+
+        window.addEventListener('resize', myChart_ram.resize);
+        window.addEventListener('resize', myChart_cpu0.resize);
+        window.addEventListener('resize', myChart_cpu1.resize);
+        window.addEventListener('resize', myChart_temper.resize);
+        window.addEventListener('resize', myChart_acc.resize);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,225 @@
+/**
+# Copyright 2023 NXP
+# SPDX-License-Identifier: BSD-3-Clause   
+*/
+
+* {
+    padding: 0px;
+    margin: 0px;
+}
+
+option {
+    color: black;
+}
+
+#status1 {
+    display: flex;
+}
+
+#status2 {
+    display: none;
+}
+
+#status3 {
+    display: none;
+}
+
+#header {
+    width: auto;
+    height: 48px;
+    background-color: #07151b;
+}
+
+#return_button {
+    height: 48px;
+    float: left;
+    color: aliceblue;
+    line-height: 48px;
+    margin-left: 15px;
+    cursor: pointer;
+}
+
+#nxp_logo {
+    float: right;
+    height: 48px;
+}
+
+.container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#bticon {
+    height: 48px;
+}
+
+.login-form {
+    width: 240px;
+    /* height: 220px; */
+    display: flex;
+    flex-direction: column;
+    padding: 40px;
+    padding-bottom: 0px;
+    text-align: center;
+    position: relative;
+    z-index: 100;
+    background: inherit;
+    border-radius: 18px;
+    overflow: hidden;
+    background-color: #07151b;
+}
+
+.login-form h2 {
+    font-size: 25px;
+    font-weight: 400;
+    color: #3d5245;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.login-form input,
+.login-form button,
+.login-form select {
+    margin: 6px 0;
+    height: 36px;
+    border: none;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    padding: 0 14px;
+    color: #3d5245;
+}
+
+.login-form input::placeholder {
+    color: #3d5245;
+}
+
+.login-form button:focus,
+.login-form input:focus {
+    outline: 0;
+}
+
+.login-form button {
+    margin-top: 24px;
+    background-color: rgba(255, 255, 255, 0.4);
+    color: white;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: 0.4s;
+    font-size: 15px;
+}
+
+.login-form button:hover {
+    background-color: rgba(12, 80, 38, 0.67);
+}
+
+#connect_button,
+#connect_button_2 {
+    background-color: green;
+}
+
+#connect_button:hover,
+#connect_button_2:hover {
+    background-color: rgba(12, 80, 38, 0.67);
+}
+
+#select_bt_name {
+    color: aliceblue;
+    font-weight: 400;
+    font-size: 15px;
+    appearance: none;
+    background: url(../img/icons/arrow-down.png) no-repeat scroll right center transparent;
+    background-size: 10px;
+    background-color: rgba(255, 255, 255, 0.4);
+    background-position-x: 95%;
+}
+
+#btpwd {
+    color: aliceblue;
+    font-weight: 400;
+    font-size: 15px;
+}
+
+input::-webkit-input-placeholder {
+    color: aliceblue !important;
+}
+
+#bticon {
+    font-size: 24px;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.switch .checkbox {
+    display: none;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.checkbox:checked+.slider {
+    background-color: #008000;
+}
+
+.checkbox:focus+.slider {
+    box-shadow: 0 0 1px #008000;
+}
+
+.checkbox:checked+.slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+}
+
+
+/* Rounded sliders */
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+.button-name {
+    color: white;
+}
+
+.button-array {
+    text-align: right;
+}
+
+#bt-info-list-2,
+#bt-info-list-3 {
+    color: white;
+}

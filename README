@@ -1,0 +1,83 @@
+
+1.Introduction  
+-----------------
+
+The web server provide a new way for user to access the OrangeBox board using the browser from PC.Users can connect WiFi and BT,get the CPU and memory usage information,show the data from the accelerometer and temperature sensors.It can also act as a simple terminal.  
+
+
+2.File Tree  
+-----------------
+
+Web server Project -- The Html files are in the root dir of the project  
+|  bt.html  
+|  index.html  
+|  info.html  
+|  README.md  
+|  terminal.html  
+|  wifi.html  
+|  
+|  css --The Cascading Style Sheets used for each html file  
+|  bt.css  
+|  index.css  
+|  info.css  
+|  terminal.css  
+|  wifi.css  
+|  
+|  img -- The icons used in the project  
+|  arrow-down.png  
+|  bluetooth.png  
+|  NXP_logo_RGB_web.jpg  
+|  
+|  pictures -- The background pictures used in the project  
+|  OB.png  
+|  orangebox.jpg  
+|  wifi.jpg    
+|  
+|  js -- The function used in the project  
+|  functions.js  
+|  setAxis.js  
+|  
+|  lib -- The external function lib  
+|  echarts.min.js  
+|  font.js  
+|  jquery-3.7.0.js  
+|  
+|  php -- Php files to communicate with front-end  
+|  accelerometer.php  
+|  bluetooth.php  
+|  bt_connect.php  
+|  cpu_freq.php  
+|  cpu_info.php  
+|  cpu_single.php  
+|  general_commands.php  
+|  lscpu.php  
+|  meminfo.php  
+|  ps.php  
+|  ram_info.php  
+|  scan_v2.php  
+|  emperature.php  
+|  wifi_connect.php  
+|  
+|  sh -- Shell script operating the command to control the hardware.  
+|  accelerometer.sh  
+|  bt_connect.exp  
+|  get_cpu0_usage.sh  
+|  bt_connection_info.sh  
+|  temp-sensor.sh  
+|  wifi_connect.sh  
+|  bt_status.sh  
+|  bt_init.sh  
+
+3.Getting Started  
+-----------------
+
+- This project is test on Orangebox board. Users can easily build the web_server demo
+   to the yocto image according to the guide of the meta-nxp-web-ui layer project.  
+   
+- Power on the Orangebox board,get the IP address of your board, you can use the command like "ifconfig"  
+   
+- Open your browser and access your board through the following link:
+   "http://xx.xx.xx.xx/web_server/index.html" xx.xx.xx.xx is your IP address.
+
+
+

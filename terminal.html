@@ -1,0 +1,77 @@
+<!--
+# Copyright 2023 NXP
+# SPDX-License-Identifier: BSD-3-Clause   
+-->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='UTF-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <script src="./lib/jquery-3.7.0.js"></script>
+    <script src="./js/functions.js"></script>
+    <link rel="stylesheet" href="./css/terminal.css" />
+    <link rel="stylesheet" href="https://at.alicdn.com/t/c/font_4130672_sfajzlx1cq.css">
+    <link rel="shortcut icon" href="img/icons/title-nxp.ico" type="image/x-icon">
+    <title>Terminal</title>
+    <style>
+        body {
+            background-image: url(./img/pictures/wifi.jpg);
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+            overflow: hidden;
+        }
+    </style>
+
+
+</head>
+
+<body>
+    <div id="header">
+        <div id="return_button" class="refer">
+            <a class="icon-fanhui iconfont" onclick="window.location.href='./index.html'"></a>
+        </div>
+
+        <div id="nxp_logo">
+            <img src="./img/icons/nxp_logo.png" style="height: 48px;" />
+        </div>
+    </div>
+    <div id="container">
+        <div id="text-area">
+            <div id="title">
+                <p>Terminal</p>
+            </div>
+            <div>
+                <input type="text" id="command_input" onkeydown="if(event.keyCode==13) terminal(document.getElementById('command_input').value);">
+                <span><button id="send_button" onclick="terminal(document.getElementById('command_input').value)">send</button></span>
+            </div>
+            <div>
+                <textarea name="" id="output" cols="30" rows="10"></textarea>
+            </div>
+        </div>
+
+    </div>
+
+
+    <script>
+        function terminal(command) {
+            document.getElementById("command_input").value = ''; //clear input
+
+            $.ajax({
+                type: "GET",
+                url: "./php/general_commands.php?command=" + command,
+                async: true,
+                dataType: "json",
+                success: function(data) {
+                    document.getElementById("output").append(">>" + data + "\r\n");
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
+
+</html>

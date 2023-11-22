@@ -1,0 +1,61 @@
+#!/usr/bin/expect -f
+# Copyright 2023 NXP
+# SPDX-License-Identifier: BSD-3-Clause
+
+set bt_dev_mac  [lindex $argv 0]
+
+puts "Connecting to $bt_dev_mac"
+
+set timeout -1
+
+spawn "bluetoothctl"
+expect "\[bluetooth\]"
+
+sleep 2
+
+send -- "agent on\r"
+expect "Agent is already registered"
+
+send -- "default-agent\r"
+expect "Default agent request successful"
+
+send -- "discoverable on\r"
+expect "\[bluetooth\]"
+
+puts "Start BT connection with $bt_dev_mac"
+send -- "connect $bt_dev_mac\r"
+
+expect {
+    "Enter PIN code" {
+        send -- "1234\r"
+        expect "Connection successful"
+
+        send -- "scan off\r"
+        send -- "trust $bt_dev_mac\r"
+        send -- "quit\r"
+        echo "connect successfully"
+        expect eof
+    }
+
+    "Confirm passkey" { 
+        sleep 1; 
+        send -- "yes\r"; 
+        expect "Connection successful"
+        send -- "scan off\r"
+        send -- "trust $bt_dev_mac\r"
+        send -- "quit\r"
+        echo "connect successfully"
+        expect eof
+        
+    }
+    "not available" {
+        send -- "quit\r"
+        echo "not available"
+        expect eof
+    }
+}
+
+
+
+
+

@@ -1,0 +1,64 @@
+/**
+# Copyright 2023 NXP
+# SPDX-License-Identifier: BSD-3-Clause   
+*/
+* {
+    padding: 0px;
+    margin: 0px;
+}
+
+#header {
+    width: auto;
+    height: 48px;
+    background-color: #07151b;
+}
+
+#return_button {
+    height: 48px;
+    float: left;
+    color: aliceblue;
+    line-height: 48px;
+    margin-left: 15px;
+    cursor: pointer;
+}
+
+#nxp_logo {
+    float: right;
+    height: 48px;
+}
+
+#container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#text-area {
+    margin-top: 10vh;
+}
+
+#title {
+    width: 80vw;
+    height: 6vh;
+    display: inline-block;
+    text-align: center;
+    font-size: 40px;
+    font-weight: bold;
+    color: white;
+}
+
+#command_input {
+    width: 80vw;
+    height: 5vh;
+}
+
+#output {
+    width: 80vw;
+    height: 60vh;
+    margin-top: 5vh;
+}
+
+#send_button {
+    height: 5vh;
+    width: 8vw;
+}
