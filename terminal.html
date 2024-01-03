@@ -64,7 +64,11 @@
                 async: true,
                 dataType: "json",
                 success: function(data) {
-                    document.getElementById("output").append(">>" + data + "\r\n");
+                    document.getElementById("output").append("$ " + command+ "\r\n");
+                    for(var i=0;i< Object.keys(data).length;i++)
+                    {
+                        document.getElementById("output").append(data[i] + "\r\n");
+                    }
                 }
             });
         }
