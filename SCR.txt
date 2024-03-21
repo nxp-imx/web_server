@@ -1,7 +1,7 @@
 --------------------------------------------
 
 Package:                   i.MX8DXL web_server release
-Version:                   v1.0
+Version:                   v1.1
 Date:                      December 2023
 Outgoing License:          LA_OPT_NXP_Software_License v49 Sep 2023 - Additional distribution license granted - Section 2.3 applies
 License File:              LICENSE.txt
