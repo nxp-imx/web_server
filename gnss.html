@@ -1,0 +1,79 @@
+<!--
+# Copyright 2023 NXP
+# SPDX-License-Identifier: BSD-3-Clause   
+-->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='UTF-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <script src="./lib/jquery-3.7.0.js"></script>
+    <script src="./lib/echarts.min.js"></script>
+    <script src="./js/functions.js"></script>
+    <script src="lib/font.js" crossorigin="anonymous"></script>
+    <link rel="shortcut icon" href="img/icons/title-nxp.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="css/info.css">
+    <style>
+        body {
+            background-image: url(./img/pictures/wifi.jpg);
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+        }
+    </style>
+
+    <title>Info</title>
+
+</head>
+
+<body>
+    <div id="header">
+        <div id="return_button">
+            <a id="icon-fanhui" class="icon-fanhui iconfont" onclick="window.location.href='index.html'"></a>
+        </div>
+        <div id="nxp_logo">
+            <img src="img/icons/nxp_logo.png" style="height: 48px;" />
+        </div>
+    </div>
+    <div id="board-name">
+        <p>OrangeBox</p>
+        <p id="board-name-line2">GNSS Information</p>
+    </div>
+    <div class="charts-container">
+        <div id="box1" class="box">
+            <div id="list1">
+                <li id="mTime">Time : </li>
+                <li id="mSv">Satellites : </li>
+                <li id="mLatitude">Latitude :</li>
+                <li id="mLongitude">Longitude :</li>
+                <li id="mHeight">Height : </li>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        gnss_init();
+        setInterval(function() {
+            show_gnss_info();
+        }, 2000);
+        
+        function gnss_init() {
+            $.ajax({
+                type: "GET",
+                url: "./php/general_commands.php?command=sh /www/pages/web_server/sh/gnss.sh init",
+                async: false,
+                dataType: "json",
+                success: function(data) {}
+            });
+        }
+
+
+      
+    </script>
+</body>
+
+</html>

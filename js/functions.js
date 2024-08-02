@@ -177,11 +177,72 @@ function get_ram_info(data, ram_info) {
     }
 }
 
+function cat_gnss_info() {
+    var data_recv = null;
+
+    $.ajax({
+        type: "GET",
+        url: "./php/gnss.php",
+        async: false,
+        dataType: "json",
+        success: function(data) {
+            data_recv = data;
+        }
+    });
+
+    return data_recv;
+}
+/* data info 
+   GNGGA is 1 */
+
+function get_gnss_info(data, data_info) {
+    var data_name;
+    var data_value;
+    var length = data.length;
+    var spliter_la = 0;
+    var spliter_lo = 0;
+    var data_gnss =['0','0','0','0','0','0','0','0'];
+    var data_count =0;
+    var spliter_num = 0;
+    var spliter_fst = 0;
+    var spliter_sec = 0;
+    var cmp_str = ",";
+    switch(data_info){
+        case 1:
+            spliter_la = data[0].indexOf("GNGGA");
+            if(spliter_la == 0)
+                break;
+            for (var i = spliter_la; i < data.length; i++) {
+                if(data[i] == cmp_str){
+                    spliter_num++;
+                    if(((1 < spliter_num)&&(spliter_num < 9))||(spliter_num == 12)){
+                        data_gnss[data_count]=data.slice(spliter_fst+1, i);
+                        data_count++;
+                    }
+                    if((spliter_num < 8)||(spliter_num == 11)){
+                        spliter_fst = i;
+                    }
+                    if(data_count==8){
+                        break;
+                    }
+
+                    console.log(data_gnss);
+                }
+            }
+    }
+    return data_gnss;
+}
+
+function get_string(data, data_info){
+
+}
+
 //reflash Basic Information
 function refresh_list() {
     var ram_data = cat_ram_info();
     var cpu_data = cat_cpu_info();
-    var cpu_freq = cat_cpu_freq()
+    var cpu_freq = cat_cpu_freq();
+
 
     document.getElementById("cpucores").innerHTML = "CPU(s) :";
     document.getElementById("Modelname").innerHTML = "Model name :";
@@ -200,6 +261,77 @@ function refresh_list() {
     document.getElementById("MemFree").innerHTML += get_ram_info(ram_data, "MemFree");
     document.getElementById("MemAvailable").innerHTML += get_ram_info(ram_data, "MemAvailable");
     document.getElementById("Buffers").innerHTML += get_ram_info(ram_data, "Buffers");
+
+}
+
+//reflash Basic Information
+function show_gnss_info() {
+   var gnss_data;
+  // var gnss_data =["$GNGGA,072446.00,3130.5226316,N,12024.0937010,E,4,27,0.5,31.924,M,0.000,M,2.0,*44","$GNGGA,072446.00,3130.5226316,N,12024.0937010,E,4,27,0.5,31.924,M,0.000,M,2.0,*44"];
+   var ret_data =[0,0,0];
+   var la_data =[0,0,0];
+   var la_dict ='0';
+   var lo_data =[0,0,0];
+   var lo_dict ='0';
+   var time_data  =[0,0,0];
+   var height_data = 0;
+   var sv_data = 0;
+
+    document.getElementById("mTime").innerHTML = "Time :";
+    document.getElementById("mSv").innerHTML = "Satellites :";
+    document.getElementById("mLatitude").innerHTML = "Latitude :";
+    document.getElementById("mLongitude").innerHTML = "Longitude :";
+    document.getElementById("mHeight").innerHTML = "Height :";
+    gnss_data = cat_gnss_info();
+    if((gnss_data == null) || (gnss_data.length < 2)){
+        console.log("No data")
+    }else{
+        ret_data =get_gnss_info(gnss_data[1], 1);
+        if(!(ret_data[0]== "")){
+            time_data = convert_time(ret_data[0]);
+
+        }
+        if(!(ret_data[1]== "")){
+            la_data = convert_lalo(ret_data[1]);
+            la_dict = ret_data[2];
+        }
+        if(!(ret_data[3]== "")){
+            lo_data = convert_lalo(ret_data[3]);
+            lo_dict = ret_data[4];
+        }
+        if(!(ret_data[6]== "")){
+            sv_data = ret_data[6];
+        }
+        if(!(ret_data[7]== "")){
+            height_data = ret_data[7];
+        }
+        
+        document.getElementById("mTime").innerHTML += String(time_data[0]).padStart(2,'0')+":"+String(time_data[1]).padStart(2,'0')+":"+String(time_data[2]).padStart(2,'0');
+        document.getElementById("mLatitude").innerHTML += la_data[0]+"&deg"+la_data[1]+"\'"+la_data[2]+"\"" +la_dict;
+        document.getElementById("mLongitude").innerHTML+= lo_data[0]+"&deg"+lo_data[1]+"\'"+lo_data[2]+"\"" +lo_dict;
+        document.getElementById("mSv").innerHTML += sv_data;
+        document.getElementById("mHeight").innerHTML += height_data;
+    }
+}
+function convert_lalo(data){
+    var r_data = [0,0,0];
+    var g_data = parseFloat(data);
+    if(!isNaN(g_data)){
+        r_data[0] = Math.floor(g_data/100);
+        r_data[1] = Math.floor(g_data-r_data[0]*100);
+        r_data[2] = Math.round((g_data-r_data[0]*100-r_data[1])*10000*60)/10000;
+    }
+    return r_data;
+}
+function convert_time(data){
+    var r_data = [0,0,0];
+    var g_data = parseFloat(data);
+    if(!isNaN(g_data)){
+        r_data[0] = Math.floor(g_data/10000);
+        r_data[1] = Math.floor((g_data-r_data[0]*10000)/100);
+        r_data[2] = Math.floor(g_data-r_data[0]*10000 -r_data[1]*100);
+    }
+    return r_data;
 }
 
 function formatStringLen(strVal, len, padChar) {
