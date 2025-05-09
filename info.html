@@ -40,7 +40,7 @@
         </div>
     </div>
     <div id="board-name">
-        <p>OrangeBox</p>
+        <p>OrangeBox2.0</p>
         <p id="board-name-line2">Board Information</p>
     </div>
     <div class="charts-container">
@@ -51,6 +51,8 @@
                 <li id="Modelname">Model name :</li>
                 <li id="cpufreq1">CPU1 freq :</li>
                 <li id="cpufreq2">CPU2 freq :</li>
+                <li id="cpufreq3">CPU3 freq :</li>
+                <li id="cpufreq4">CPU4 freq :</li>
                 <li id="MemTotal">Mem Total :</li>
                 <li id="MemFree">Mem Free:</li>
                 <li id="MemAvailable">Mem Available :</li>
@@ -61,6 +63,8 @@
             <div id="box3-title" class="box-title">CPU Usage</div>
             <div id="chart-cpu0" class="chart"></div>
             <div id="chart-cpu1" class="chart"></div>
+            <div id="chart-cpu2" class="chart"></div>
+            <div id="chart-cpu3" class="chart"></div>
         </div>
         <div id="box2" class="box">
             <div id="box2-title" class="box-title">RAM Usage</div>
@@ -79,18 +83,22 @@
     <script>
         var cpu_now = [
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        ];
-        var cpu_sum = [0, 0];
-        var cpu_delta = [0, 0];
-        var cpu_idle = [0, 0];
-        var cpu_used = [0, 0];
-        var cpu_usage = [0, 0, 0, 0];
-        var cpu_last = [
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         ];
-        var cpu_last_sum = [0, 0];
+        var cpu_sum = [0, 0, 0, 0];
+        var cpu_delta = [0, 0, 0, 0];
+        var cpu_idle = [0, 0, 0, 0];
+        var cpu_used = [0, 0, 0 ,0];
+        var cpu_usage = [0, 0, 0, 0];
+        var cpu_last = [
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        ];
+        var cpu_last_sum = [0, 0, 0, 0];
         var single_cpu_data;
         refresh_list();
         //init every chart
@@ -103,6 +111,14 @@
             useDirtyRect: false
         });
         var myChart_cpu1 = echarts.init(document.getElementById('chart-cpu1'), null, {
+            renderer: 'canvas',
+            useDirtyRect: false
+        });
+        var myChart_cpu2 = echarts.init(document.getElementById('chart-cpu2'), null, {
+            renderer: 'canvas',
+            useDirtyRect: false
+        });
+        var myChart_cpu3 = echarts.init(document.getElementById('chart-cpu3'), null, {
             renderer: 'canvas',
             useDirtyRect: false
         });
@@ -360,12 +376,16 @@
         myChart_ram.setOption(option_line);
         myChart_cpu0.setOption(option_line);
         myChart_cpu1.setOption(option_line);
+        myChart_cpu2.setOption(option_line);
+        myChart_cpu3.setOption(option_line);
         myChart_temper.setOption(option_temper);
         myChart_acc.setOption(option_acc);
 
         window.addEventListener('resize', myChart_ram.resize);
         window.addEventListener('resize', myChart_cpu0.resize);
         window.addEventListener('resize', myChart_cpu1.resize);
+        window.addEventListener('resize', myChart_cpu2.resize);
+        window.addEventListener('resize', myChart_cpu3.resize);
         window.addEventListener('resize', myChart_temper.resize);
         window.addEventListener('resize', myChart_acc.resize);
     </script>

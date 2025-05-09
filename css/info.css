@@ -53,28 +53,28 @@
     }
     #box1 {
         width: 35vw;
-        height: 33vh;
+        height: 50vh;
         float: left;
         margin: 0 5vw;
         text-align: left;
-        margin-top: 5vh;
+        margin-top: 18vh;
     }
     #box2 {
         width: 35vw;
-        height: 33vh;
+        height: 40vh;
         float: left;
         margin: 0 5vw;
         margin-top: 5vh;
     }
     #box3 {
         width: 50vw;
-        height: 33vh;
+        height: 70vh;
         float: left;
         margin-top: 5vh;
     }
     #box4 {
         width: 50vw;
-        height: 33vh;
+        height: 40vh;
         float: left;
         margin-top: 5vh;
     }

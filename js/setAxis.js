@@ -52,6 +52,40 @@ var y1data = [{
     },
 }];
 
+var y2data = [{
+    name: 'CPU2 usage', 
+    type: 'line', 
+    data: [0], 
+    markPoint: {
+        data: [
+            { type: 'max', name: 'MAX_DATA' },
+            { type: 'min', name: 'MIN_DATA' }
+        ]
+    },
+    markLine: {
+        data: [
+            { type: 'average', name: 'AVE_DATA' }
+        ]
+    },
+}];
+
+var y3data = [{
+    name: 'CPU3 usage', 
+    type: 'line', 
+    data: [0], 
+    markPoint: {
+        data: [
+            { type: 'max', name: 'MAX_DATA' },
+            { type: 'min', name: 'MIN_DATA' }
+        ]
+    },
+    markLine: {
+        data: [
+            { type: 'average', name: 'AVE_DATA' }
+        ]
+    },
+}];
+
 var xdata = new Array(); 
 var arrtitle = ['CPU usage']; 
 var now = new Date(); 
@@ -81,6 +115,16 @@ function UpdateData() {
         y1data[0].data.shift();
     }
     y1data[0].data.push(calc_cpu_usage(single_cpu_data, 2).toFixed(2));
+    //update cpu3
+    if (y2data[0].data.length >= 10) {
+        y2data[0].data.shift();
+    }
+    y2data[0].data.push(calc_cpu_usage(single_cpu_data, 3).toFixed(2));
+    //update cpu4
+    if (y3data[0].data.length >= 10) {
+        y3data[0].data.shift();
+    }
+    y3data[0].data.push(calc_cpu_usage(single_cpu_data, 4).toFixed(2));
 }
 
 //Check TempData，change color according to the value: value<= 30 :green，30<value<40: orange，value >=40 red
@@ -125,6 +169,14 @@ setInterval(function() {
         useDirtyRect: false
     });
     var myChart_cpu1 = echarts.init(document.getElementById('chart-cpu1'), null, {
+        renderer: 'canvas',
+        useDirtyRect: false
+    });
+    var myChart_cpu2 = echarts.init(document.getElementById('chart-cpu2'), null, {
+        renderer: 'canvas',
+        useDirtyRect: false
+    });
+    var myChart_cpu3 = echarts.init(document.getElementById('chart-cpu3'), null, {
         renderer: 'canvas',
         useDirtyRect: false
     });
@@ -186,6 +238,48 @@ setInterval(function() {
             top: "top"
         },
         series: y1data
+    });
+    myChart_cpu2.setOption({
+        xAxis: [{
+            type: 'category',
+            boundaryGap: false,
+            data: xdata
+        }],
+        title: {
+            text: 'CPU2 usage',
+            textStyle: {
+                color: '#000000'
+            },
+            left: "center",
+            top: "top"
+        },
+        grid: {
+            top: '20%',
+            bottom: '15%',
+            left: '15%'
+        },
+        series: y2data
+    });
+    myChart_cpu3.setOption({
+        xAxis: [{
+            type: 'category',
+            boundaryGap: false,
+            data: xdata
+        }],
+        grid: {
+            top: '20%',
+            bottom: '15%',
+            left: '15%'
+        },
+        title: {
+            text: 'CPU3 usage',
+            textStyle: {
+                color: '#000000'
+            },
+            left: "center",
+            top: "top"
+        },
+        series: y3data
     });
     var temperature = (Number(cat_temp_info()[0].replace("°C", "")) - 6).toFixed(1);
     var acc_data = cat_acc_info();

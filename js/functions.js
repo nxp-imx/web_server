@@ -248,6 +248,8 @@ function refresh_list() {
     document.getElementById("Modelname").innerHTML = "Model name :";
     document.getElementById("cpufreq1").innerHTML = "CPU1 freq :";
     document.getElementById("cpufreq2").innerHTML = "CPU2 freq :";
+    document.getElementById("cpufreq3").innerHTML = "CPU3 freq :";
+    document.getElementById("cpufreq4").innerHTML = "CPU4 freq :";
     document.getElementById("MemTotal").innerHTML = "Mem Total :";
     document.getElementById("MemFree").innerHTML = "Mem Free :";
     document.getElementById("MemAvailable").innerHTML = "Mem Available :";
@@ -257,6 +259,8 @@ function refresh_list() {
     document.getElementById("Modelname").innerHTML += get_cpu_info(cpu_data, "Model name");
     document.getElementById("cpufreq1").innerHTML += cpu_freq[0];
     document.getElementById("cpufreq2").innerHTML += cpu_freq[1];
+    document.getElementById("cpufreq3").innerHTML += cpu_freq[2];
+    document.getElementById("cpufreq4").innerHTML += cpu_freq[3];
     document.getElementById("MemTotal").innerHTML += get_ram_info(ram_data, "MemTotal");
     document.getElementById("MemFree").innerHTML += get_ram_info(ram_data, "MemFree");
     document.getElementById("MemAvailable").innerHTML += get_ram_info(ram_data, "MemAvailable");

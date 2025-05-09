@@ -2,7 +2,7 @@
 # Copyright 2023 NXP
 # SPDX-License-Identifier: BSD-3-Clause
 
-hex_temp=$(i2cget -y 12 0x49 0 w)
+hex_temp=$(i2cget -y 5 0x48 0 w)
 hex_temp_byte_swapped=$(echo $(( ((hex_temp & 0xFF) << 8) | (hex_temp >> 8) )))
 temp=$(echo $((hex_temp_byte_swapped >> 5)))
 if [ $((temp & 0x400)) -eq 0 ]
