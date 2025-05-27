@@ -81,13 +81,6 @@ a {
     flex: 2;
 }
 
-.log-sign {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex: 1;
-}
-
 .logo {
     color: #fff;
     font-size: 1.1rem;
@@ -259,8 +252,7 @@ a {
     #check:checked~.nav-btn {
         transform: translateX(0);
     }
-    #check:checked~.nav-btn .nav-link,
-    #check:checked~.nav-btn .log-sign {
+    #check:checked~.nav-btn .nav-link {
         animation: animation .5s ease forwards var(--i);
     }
     .nav-links {
@@ -290,13 +282,5 @@ a {
         font-size: 1.1rem;
         transform: rotate(-90deg);
         transition: .7s;
-    }
-    .log-sign {
-        flex: initial;
-        width: 100%;
-        padding: 1.5rem 1.9rem;
-        justify-content: flex-start;
-        opacity: 0;
-        transform: translateY(15px);
     }
 }
