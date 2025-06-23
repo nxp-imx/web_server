@@ -135,11 +135,9 @@
             </div>
             <p>
                 <span><button type="button"  value="Scan" onclick="scan_bt()" style="color:aliceblue;font-weight:bold;width:100px;padding:0  ">scan</button></span>
-                <!-- <span><button type="button"  value="Remove" onclick="remove_bt()" style="color:aliceblue;font-weight:bold; ">remove</button></span> -->
                 <span><button id="connect_button" type="button"  value="Connect" onclick="connect_bt()" style="color:aliceblue;font-weight:bold;width:100px;padding:0  ">connect</button></span>
             </p>
             <div class="loading" id="loading" style="align-self: center; height:60px;"> </div>
-            <!-- <div style="color:#ffffff;padding-bottom:10px">This is a command line</div> -->
         </form>
 
         <form class="login-form" id="status2">
@@ -195,104 +193,39 @@
     <!-- =============================================================================================== -->
     <script>
         var status;
-        var btshow;
-        var btinfo; //bluetooth show information
-        var bt_status = 0;
+        var btinfo = 0; //bluetooth show information
+        var first_init = 0;
+        var raw_info; // Raw data after scanning
+        var checkbox_power;
+        var checkbox_discoverable;
+        var bt_list = new Map();
 
-        bt_init();
-
-        check_status();
-
-        if (status == 'status 1') {
-            document.getElementById('status1').style.display = 'flex';
-            document.getElementById('status2').style.display = 'none';
-            document.getElementById('status3').style.display = 'none';
-
-            var raw_info; // Raw data after scanning
-            var bt_list = new Map();
-            var checkbox_power = document.getElementById('check-power');
-            var checkbox_discoverable = document.getElementById('check-discoverable');
-
-
-            check_checkbox_status();
-
-            setInterval(function() {
-                bt_init();
-                check_checkbox_status();
-            }, 5000);
-
-            checkbox_power.addEventListener('change', (event) => {
-                if (document.getElementById('check-power').checked == true) {
-                    general_commands('bluetoothctl power on');
-                } else {
-                    general_commands('bluetoothctl power off');
-                }
-            });
-
-            checkbox_discoverable.addEventListener('change', (event) => {
-                if (document.getElementById('check-discoverable').checked == true) {
-                    general_commands('bluetoothctl discoverable on');
-                } else {
-                    general_commands('bluetoothctl discoverable off');
-                }
-            });
-
-        } else if (status == 'status 2') {
-            document.getElementById('status1').style.display = 'none';
-            document.getElementById('status2').style.display = 'flex';
-            document.getElementById('status3').style.display = 'none';
-
-            $.ajax({
-                type: "GET",
-                url: "./php/bt_connection_info.php",
-                async: false,
-                dataType: "json",
-                success: function(data) {
-                    console.log(data);
-                    for (let num = 0; num < data.length; num++) {
-                        document.getElementById('bt-info-list-2').children[num].innerHTML = data[num];
-                    }
-                }
-            });
-        } else if (status == 'status 3') {
-            document.getElementById('status1').style.display = 'none';
-            document.getElementById('status2').style.display = 'none';
-            document.getElementById('status3').style.display = 'flex';
-
-            $.ajax({
-                type: "GET",
-                url: "./php/bt_connection_info.php",
-                async: false,
-                dataType: "json",
-                success: function(data) {
-                    console.log(data);
-                    for (let num = 0; num < data.length; num++) {
-                        document.getElementById('bt-info-list-3').children[num].innerHTML = data[num];
-                    }
-                }
-            });
-        } else {
-            console.log('error');
-        }
-
+        document.getElementById('status1').style.display = 'flex';
+      
         //Scan bluetooth devices, results will be stored in array varieable "raw_info".
         function scan_bt() {
-            $(loading).css("visibility", "visible");
 
-            $.ajax({
-                type: "GET",
-                url: "./php/bluetooth.php",
-                async: true,
-                dataType: "json",
-                success: function(data) {
-                    raw_info = data; 
+            if(first_init == 0){
+                bt_init();
+                first_init = 1;
+                check_status();
+            }
+            if(status == 'status 1'){
+                    $(loading).css("visibility", "visible");
 
-                    bt_data_proc(raw_info); 
-                    bt_add_list(bt_list); 
-
-                    $(loading).css("visibility", "hidden"); 
-                }
-            });
+                    $.ajax({
+                        type: "GET",
+                        url: "./php/bluetooth.php",
+                        async: true,
+                        dataType: "json",
+                        success: function(data) {
+                            raw_info = data; 
+                            bt_data_proc(raw_info); 
+                            bt_add_list(bt_list); 
+                            $(loading).css("visibility", "hidden"); 
+                        }
+                    })
+            }
         }
 
         function remove_bt() {
@@ -310,7 +243,7 @@
         }
 
         function connect_bt() {
-            var bt_id = Array.from(bt_list.keys())[document.getElementById('select_bt_name').value] //用于选择当前下拉框选中的元素的bluetooth id
+            var bt_id = Array.from(bt_list.keys())[document.getElementById('select_bt_name').value]
             $.ajax({
                 type: "GET",
                 url: "./php/bt_connect.php?bt_id=" + bt_id,
@@ -322,12 +255,17 @@
             });
             
             status = 'status 3';
-            location.reload();
+            check_status();
         }
 
         function bt_data_proc(rawdata) {
+            var temp_value;
             for (var i = 0; i < raw_info.length; i++) {
-                bt_list.set(raw_info[i].slice((raw_info[i].search('Device') + 7), (raw_info[i].search('Device')) + 7 + 17), raw_info[i].slice((raw_info[i].search('Device') + 7 + 17 + 1), (raw_info[i].search('Device')) + 7 + 17 + 1 + 17))
+                temp_key = raw_info[i].slice((raw_info[i].search('Device') + 7), (raw_info[i].search('Device')) + 7 + 17);
+                temp_value = raw_info[i].slice((raw_info[i].search('Device') + 7 + 17 + 1), (raw_info[i].search('Device')) + 7 + 17 + 1 + 17);
+                if((temp_value != 'RSSI is nil')&&(temp_value != 'TxPower is nil')){
+                    bt_list.set(temp_key,temp_value);
+                }
             }
         }
 
@@ -335,14 +273,12 @@
             document.getElementById('select_bt_name').length = 1; 
 
             for (let i = 0; i < bt_list.size; i++) {
-                $("#select_bt_name").append(new Option(Array.from(bt_list.values())[i], i)); //二维数组中的第二列，即名称
+                $("#select_bt_name").append(new Option(Array.from(bt_list.values())[i], i));
             }
         }
 
         function bt_init() {
 
-            if (bt_status == 0) {
-                console.log("BT started0.");
                 $.ajax({
                     type: "GET",
                     url: "./php/general_commands.php?command=sh /www/pages/web_server/sh/bt_init.sh",
@@ -359,11 +295,6 @@
                         btinfo = data;
                     }
                 });
-                bt_status=1;
-            } else {
-                btinfo = btshow;
-
-            }
         }
 
         function check_status() {
@@ -377,6 +308,71 @@
                     console.log(data);
                 }
             });
+
+            if (status == 'status 1') {
+                document.getElementById('status1').style.display = 'flex';
+                document.getElementById('status2').style.display = 'none';
+                document.getElementById('status3').style.display = 'none';
+    
+                checkbox_power = document.getElementById('check-power');
+                checkbox_discoverable = document.getElementById('check-discoverable');
+                check_checkbox_status();
+
+                setInterval(function() {
+                    check_checkbox_status();
+                }, 5000);
+
+                checkbox_power.addEventListener('change', (event) => {
+                    if (document.getElementById('check-power').checked == true) {
+                        general_commands('bluetoothctl power on');
+                    } else {
+                        general_commands('bluetoothctl power off');
+                    }
+                });
+
+                checkbox_discoverable.addEventListener('change', (event) => {
+                    if (document.getElementById('check-discoverable').checked == true) {
+                        general_commands('bluetoothctl discoverable on');
+                    } else {
+                        general_commands('bluetoothctl discoverable off');
+                    }
+                });
+
+            } else if (status == 'status 2') {
+                document.getElementById('status1').style.display = 'none';
+                document.getElementById('status2').style.display = 'flex';
+                document.getElementById('status3').style.display = 'none';
+
+                $.ajax({
+                    type: "GET",
+                    url: "./php/bt_connection_info.php",
+                    async: false,
+                    dataType: "json",
+                    success: function(data) {
+                        for (let num = 0; num < data.length; num++) {
+                            document.getElementById('bt-info-list-2').children[num].innerHTML = data[num];
+                        }
+                    }
+                });
+            } else if (status == 'status 3') {
+                document.getElementById('status1').style.display = 'none';
+                document.getElementById('status2').style.display = 'none';
+                document.getElementById('status3').style.display = 'flex';
+
+                $.ajax({
+                    type: "GET",
+                    url: "./php/bt_connection_info.php",
+                    async: false,
+                    dataType: "json",
+                    success: function(data) {
+                        for (let num = 0; num < data.length; num++) {
+                            document.getElementById('bt-info-list-3').children[num].innerHTML = data[num];
+                        }
+                    }
+                });
+            } else {
+                console.log('error');
+            }
         }
 
         function check_checkbox_status() {
@@ -405,7 +401,7 @@
                 dataType: "json",
                 success: function(data) {
                     console.log(data);
-                    location.reload();
+                    check_status();
                 }
             });
         }
@@ -420,7 +416,7 @@
                 dataType: "json",
                 success: function(data) {
                     console.log(data);
-                    location.reload();
+                   check_status();
                 }
             });
         }
@@ -436,7 +432,7 @@
                 dataType: "json",
                 success: function(data) {
                     console.log(data);
-                    location.reload();
+                    check_status();
                 }
             });
         }
@@ -451,12 +447,10 @@
                 dataType: "json",
                 success: function(data) {
                     console.log(data);
-                    location.reload();
+                    check_status();
                 }
             });
         }
     </script>
-
 </body>
-
 </html>
