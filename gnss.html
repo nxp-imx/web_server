@@ -89,20 +89,20 @@
         gnss_init();
         setInterval(function() {
             show_gnss_info();
-        }, 2000);
+        }, 1000);
         
         function gnss_init() {
+            var init_ret ='';
             $.ajax({
                 type: "GET",
                 url: "./php/general_commands.php?command=sh /www/pages/web_server/sh/gnss.sh init",
                 async: false,
                 dataType: "json",
-                success: function(data) {}
+                success: function(data) {
+                }
             });
         }
 
-
-      
     </script>
 </body>
 
