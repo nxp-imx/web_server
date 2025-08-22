@@ -148,6 +148,68 @@ function cat_ram_info() {
     return data_recv;
 }
 
+function cat_distance_info() {
+    var data_rev = [
+        ['0','0'],
+        ['0','0'],
+        ['0','0']
+    ];
+    var end_str_dis = ",";
+    var temp;
+    var spliter_anc;
+    var spliter_dis;
+    var spliter_rssi;
+    var i=0,j=0,index=0;
+    $.ajax({
+        type: "GET",
+        url: "./php/sca.php",
+        async: false,
+        dataType: "json",
+        success: function(data) {
+                console.log(data.length);
+                for (i = 0; i < data.length; i++) {
+                    if(data[i].indexOf("data_type\":4")==-1){
+                        continue;
+                    }
+                    spliter_anc = data[i].indexOf("anc_id\":");
+                    if(spliter_anc != -1){
+                        for (j = spliter_anc; j < data[i].length; j++) {
+                            if(data[i][j] == end_str_dis){
+                                temp = data[i].slice(spliter_anc+8, j);
+                                index=parseInt(data[i].slice(spliter_anc+8, j));
+                                if(index==128){
+                                    index=0;
+                                }
+                                break;
+                            }
+                        }
+                    } else{
+                        spliter_anc = 0;
+                    }
+                    spliter_dis = data[i].indexOf("filtered_dist_cm\":",spliter_anc);
+                    if(spliter_dis != -1){
+                        for (j = spliter_dis; j < data[i].length; j++) {
+                            if(data[i][j] == end_str_dis){
+                                data_rev[index][0]=data[i].slice(spliter_dis+18, j);
+                                break;
+                            }
+                        }
+                    }
+                    spliter_rssi = data[i].indexOf("rssi_peer\":",spliter_dis);
+                    if(spliter_rssi != -1){
+                        for (j = spliter_rssi; j < data[i].length; j++) {
+                            if(data[i][j] == end_str_dis){
+                                data_rev[index][1]=data[i].slice(spliter_rssi+11, j);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    return data_rev;
+}
+
 //Get ram information
 //input： raw data ram_info
 //         ram_info range:MemTotal, MemFree, MemAvailable, Buffers, Cached, SwapCached, Active, 
