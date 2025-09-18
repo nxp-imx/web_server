@@ -1,0 +1,239 @@
+<!--
+# Copyright 2023 NXP
+# SPDX-License-Identifier: BSD-3-Clause   
+-->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='UTF-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <script src="./lib/jquery-3.7.0.js"></script>
+    <script src="./lib/echarts.min.js"></script>
+    <script src="./js/functions.js"></script>
+    <script src="lib/font.js" crossorigin="anonymous"></script>
+    <link rel="shortcut icon" href="img/icons/title-nxp.ico" type="image/x-icon">
+    <link rel="stylesheet" href="css/info.css">
+    <link rel="stylesheet" href="css/nav.css">
+    <link rel="stylesheet" href="css/quantum.css">
+    <style>
+        
+    </style>
+
+    <title>Quantum Radio</title>
+
+</head>
+
+<body>
+    <div id="header">
+        <div id="return_button">
+            <img src="img/icons/back.png" style="height: 25px; margin: 10px 0px;" onclick="window.history.back()" />
+        </div>
+        <div id="nxp_logo">
+            <img src="img/icons/nxp_logo.png" style="height: 48px;" />
+        </div>
+        <div class="nav_container">
+            <input type="checkbox" name="" id="check">
+            <div class="nav-btn">
+                <div class="nav-links">
+                    <ul>
+                        <li class="nav-link" style="--i: .6s">
+                            <a href="./index.html">Home</a>
+                        </li>
+                        <li class="nav-link" style="--i: .85s">
+                            <a href="./wifi.html">WIFI</a>
+                        </li>
+                        <li class="nav-link" style="--i: 1.1s">
+                            <a href="./bt.html">Bluetooth</a>
+                        </li>
+                        <li class="nav-link" style="--i: 1.35s">
+                            <a href="./info.html">Board Information</a>
+                        </li>
+                        <li class="nav-link" style="--i: 1.35s">
+                            <a href="./terminal.html">Terminal</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="hamburger-menu-container">
+                <div class="hamburger-menu">
+                    <div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="board-name">
+        <p>OrangeBox</p>
+        <p id="board-name-line2">Quantum Radio</p>
+    </div>
+    <div class="radio-controls">
+        <button id="startBtn" class="radio-btn">Start</button>
+        <button id="stopBtn" class="radio-btn stop">Stop</button>
+        <button id="resetBtn" class="radio-btn reset">Reset</button>
+    </div>
+    
+    <div class="current-station">
+        Current Station: <span id="currentStation">None</span>
+    </div>
+    
+    <div class="charts-container">
+        <div id="stations-box" class="box">
+            <div class="box-title">Available Stations</div>
+            <div id="stationList" class="station-list">
+                <!-- Stations will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Radio status
+        var radioStatus = "stopped";
+        var currentStation = null;
+        var stations = [];
+        
+        // Initialize radio
+        $(document).ready(function() {
+            updateStationList();
+            setInterval(updateStationList, 5000); // Update station list every 5 seconds
+        });
+        
+        // Start radio
+        $('#startBtn').click(function() {
+            $.ajax({
+                type: "GET",
+                url: "./php/general_commands.php?command=sh /www/pages/web_server/sh/radio.sh start",
+                async: true,
+                dataType: "json",
+                success: function(data) {
+                    radioStatus = "running";
+                    console.log("Radio started");
+                }
+            });
+        });
+        
+        // Stop radio
+        $('#stopBtn').click(function() {
+            $.ajax({
+                type: "GET",
+                url: "./php/general_commands.php?command=sh /www/pages/web_server/sh/radio.sh stop",
+                async: true,
+                dataType: "json",
+                success: function(data) {
+                    radioStatus = "stopped";
+                    currentStation = null;
+                    $('#currentStation').text("None");
+                    $('.station-item').removeClass('active');
+                    console.log("Radio stopped");
+                }
+            });
+        });
+        
+        // Reset radio
+        $('#resetBtn').click(function() {
+            $.ajax({
+                type: "GET",
+                url: "./php/general_commands.php?command=sh /www/pages/web_server/sh/radio.sh reset",
+                async: true,
+                dataType: "json",
+                success: function(data) {
+                    radioStatus = "stopped";
+                    currentStation = null;
+                    $('#currentStation').text("None");
+                    $('.station-item').removeClass('active');
+                    console.log("Radio reset");
+                }
+            });
+        });
+        
+        // Update station list
+        function updateStationList() {
+            // In a real implementation, this would fetch from a PHP script
+            // that interacts with a radio service
+            $.ajax({
+                type: "GET",
+                url: "./php/general_commands.php?command=sh /www/pages/web_server/sh/radio.sh list",
+                async: true,
+                dataType: "json",
+                success: function(data) {
+                    stations = parseStations(data);
+                    renderStationList();
+                }
+            });
+        }
+        
+        // Parse station data
+        function parseStations(data) {
+            // This is a placeholder - in a real implementation, 
+            // you would parse actual data from the radio service
+            if (data && data.length > 0) {
+                // Assuming data is an array of strings with station info
+                return data.map((item, index) => {
+                    // Try to parse as JSON if possible, otherwise create a default structure
+                    try {
+                        return JSON.parse(item);
+                    } catch (e) {
+                        // If parsing fails, create a default station object
+                        return {
+                            id: index,
+                            name: item || `Station ${index + 1}`,
+                            frequency: "0.0 MHz"
+                        };
+                    }
+                });
+            }
+            
+            // Default stations for demonstration
+            return [
+                { id: 1, name: "NXP FM Radio", frequency: "98.5 MHz" },
+                { id: 2, name: "Quantum Hits", frequency: "102.7 MHz" },
+                { id: 3, name: "Classic Rock", frequency: "105.3 MHz" },
+                { id: 4, name: "News Network", frequency: "108.9 MHz" },
+                { id: 5, name: "Jazz Lounge", frequency: "88.1 MHz" }
+            ];
+        }
+        
+        // Render station list
+        function renderStationList() {
+            var listHtml = '';
+            stations.forEach(function(station) {
+                var activeClass = (currentStation && currentStation.id === station.id) ? 'active' : '';
+                listHtml += `<div class="station-item ${activeClass}" data-id="${station.id}">`;
+                listHtml += `<strong>${station.name}</strong> - ${station.frequency}`;
+                listHtml += `</div>`;
+            });
+            
+            $('#stationList').html(listHtml);
+            
+            // Add click handlers to station items
+            $('.station-item').click(function() {
+                var stationId = $(this).data('id');
+                selectStation(stationId);
+            });
+        }
+        
+        // Select a station
+        function selectStation(stationId) {
+            var station = stations.find(s => s.id == stationId);
+            if (station) {
+                currentStation = station;
+                $('#currentStation').text(station.name + " (" + station.frequency + ")");
+                $('.station-item').removeClass('active');
+                $(`.station-item[data-id="${stationId}"]`).addClass('active');
+                
+                // Send command to tune to the station
+                $.ajax({
+                    type: "GET",
+                    url: "./php/general_commands.php?command=sh /www/pages/web_server/sh/radio.sh tune " + stationId,
+                    async: true,
+                    dataType: "json",
+                    success: function(data) {
+                        console.log("Tuned to station: " + station.name);
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+
+</html>
