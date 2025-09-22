@@ -229,7 +229,8 @@ class RadioController {
                         $output['status'] = "Error";
                     } else {
                         $station_message = substr($ret, 3);
-                        $output[] = $this->parse_station_list($station_message);
+                        $output['station_list'] = $this->parse_station_list($station_message);
+                        $output['status'] = "OK";
                     }
                     break;
                 case "stop_scan":
@@ -240,26 +241,26 @@ class RadioController {
                         $output['status'] = "OK";
                     break;
                 default:
-                    // TODO: report error
-                    echo "Unknow command.";
+                    $this->log_to_file("Unkonw action type: ". $action);
             }
         } elseif (isset($_GET['tune'])) {
             $stationId = $_GET['tune'];
-            $output = $this->sendCommand("tune " . escapeshellarg($stationId) . "\n");
+            $intnum = intval($stationId);
+            $cmd_array = [0x06, 0x00, 0x08];
+            for ($i = 7; $i >= 0; $i--) {
+                $cmd_array[] = ($intnum >> ($i * 8)) & 0xFF;
+            }
+            $ret = $this->sendCommand($cmd_array);
+            if (ord($ret[3]) !== 0x01) 
+                $output['status'] = "Error";
+            else
+                $output['status'] = "OK";
         } else {
-            // Default to list stations
-            $output = $this->sendCommand("list\n");
+            $this->log_to_file("Unknow request type");
         }
         
-        var_dump($output);
-
-        // TODO: encode response message as json format to ajax
-        // if (is_string($output) && json_decode($output) === null) {
-        //     echo json_encode([$output]);
-        // } else {
-        //     echo "output is bytes array.";
-        //     var_dump($output);
-        // }
+        // Encode response message as json format to ajax
+        echo json_encode($output);
     }
     
     public function __destruct() {
