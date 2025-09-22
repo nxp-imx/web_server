@@ -43,7 +43,40 @@ class RadioController {
     }
 
     private function parse_station_list($station_list_message) {
+        // message example: bearer(1) + frequency(8) + quality(1)
+        // 01 00 00 00 00 05 37 24 e0 1f 
+        // 01 00 00 00 00 05 3e c6 00 1e 
+        // 01 00 00 00 00 05 37 24 e0 1e 
+        // 01 00 00 00 00 05 37 24 e0 20 
+        // 01 00 00 00 00 05 b8 d8 00 1e
+        $station_list = [];
+        if (strlen($station_list_message) % 10 !== 0) {
+            $this->log_to_file("parse station list error, station_list_message: " . bin2hex($station_list_message));
+            return $station_list;
+        }
 
+        $station_cnt = strlen($station_list_message) / 10;
+    
+        for ($i = 0; $i < $station_cnt; $i++) {
+            $offset = $i * 10;
+        
+            // Get Bearer
+            $bearer = ord($station_list_message[$offset]);
+        
+            // Get ferquency
+            $frequency_bytes = substr($station_list_message, $offset + 1, 8);
+            $frequency = unpack('J', $frequency_bytes)[1];
+        
+            // Get quality
+            $quality = ord($station_list_message[$offset + 9]);
+        
+            $station_list[] = [
+                'bearer' => $bearer,
+                'frequency' => $frequency,
+                'quality' => $quality
+            ];
+        }
+        return $station_list;
     }
     
     private function sendCommand($command) {
@@ -85,7 +118,7 @@ class RadioController {
         }
         
         // Read response: first read 3-byte header, then read payload based on length field
-        $responseBytes = [];
+        $responseBytes = '';
         // First read 3 bytes as header
         $headerBuffer = '';
         $headerBytesRead = 0;
@@ -103,10 +136,7 @@ class RadioController {
         $this->log_to_file("Header buffer content: " . bin2hex($headerBuffer));
         
         
-        // Convert header to byte array
-        for ($i = 0; $i < strlen($headerBuffer); $i++) {
-            $responseBytes[] = ord($headerBuffer[$i]);
-        }
+        $responseBytes .= $headerBuffer;
         
         // Check if we have a complete header
         if (strlen($headerBuffer) == 3) {
@@ -124,19 +154,13 @@ class RadioController {
                     $this->log_to_file("Socket read failed or connection closed. Read $payloadBytesRead of $length bytes.");
                     break;
                 }
-                for ($i = 0; $i < strlen($buffer); $i++) {
-                    $responseBytes[] = ord($buffer[$i]);
-                }
+
+                $responseBytes .= $buffer;
                 $payloadBytesRead += strlen($buffer);
             }
-            $this->log_to_file("Payload content: ". bin2hex($payloadBytesRead));
+            $this->log_to_file("response content: ". bin2hex($responseBytes));
         }
-        
-        if (empty($responseBytes)) {
-            $this->handleSocketError("Failed to read response");
-            return json_encode(["error" => "Failed to read response"]);
-        }
-        
+        $this->log_to_file("read socket done.");
         // Return byte array
         return $responseBytes;
     }
@@ -154,64 +178,66 @@ class RadioController {
                 case 'start':
                     // Send reset command
                     $ret = $this->sendCommand([0x00, 0x00, 0x00]);
-                    if ($ret[3] !== 0x01) {
+                    if (ord($ret[3]) !== 0x01) {
                         $output['status'] = "Error";
                         break;
                     }
                     // Send boot command
-                    $output = $this->sendCommand([0x01, 0x00, 0x00]);
-                    if ($ret[3] !== 0x01) {
+                    $ret = $this->sendCommand([0x01, 0x00, 0x00]);
+                    if (ord($ret[3]) !== 0x01) {
                         $output['status'] = "Error";
                         break;
                     }
                     // Send attach command
-                    $output = $this->sendCommand([0x02, 0x00, 0x00]);
-                    if ($ret[3] !== 0x01) {
+                    $ret = $this->sendCommand([0x02, 0x00, 0x00]);
+                    if (ord($ret[3]) !== 0x01) {
                         $output['status'] = "Error";
                         break;
                     }
                     // Send start scan command
-                    $output = $this->sendCommand([0x03, 0x00, 0x00]);
-                    if ($ret[3] !== 0x01) {
+                    $ret = $this->sendCommand([0x03, 0x00, 0x00]);
+                    if (ord($ret[3]) !== 0x01) {
                         $output['status'] = "Error";
                         break;
                     }
                     $output['status'] = "OK";
                     break;
                 case 'stop':
-                    $output = $this->sendCommand([0x00, 0x00, 0x00]);
-                    if ($ret[3] !== 0x01) {
+                    $ret = $this->sendCommand([0x00, 0x00, 0x00]);
+                    if (ord($ret[3]) !== 0x01) 
                         $output['status'] = "Error";
                     else
                         $output['status'] = "OK";
                     break;
                 case 'reset':
-                    $output = $this->sendCommand([0x00, 0x00, 0x00]);
-                    if ($ret[3] !== 0x01) {
+                    $ret = $this->sendCommand([0x00, 0x00, 0x00]);
+                    if (ord($ret[3]) !== 0x01) 
                         $output['status'] = "Error";
                     else
                         $output['status'] = "OK";
-                    break;
                     break;
                 case 'start_scan':
-                    $output = $this->sendCommand([0x03, 0x00, 0x00]);
-                    if ($ret[3] !== 0x01) {
+                    $ret = $this->sendCommand([0x03, 0x00, 0x00]);
+                    if (ord($ret[3]) !== 0x01) 
                         $output['status'] = "Error";
                     else
                         $output['status'] = "OK";
-                    break;
                     break;
                 case 'list':
-                    $output = $this->sendCommand([0x05, 0x00, 0x00]);
-
+                    $ret = $this->sendCommand([0x05, 0x00, 0x00]);
+                    if (strlen($ret) === 4) {
+                        $output['status'] = "Error";
+                    } else {
+                        $station_message = substr($ret, 3);
+                        $output[] = $this->parse_station_list($station_message);
+                    }
                     break;
                 case "stop_scan":
-                    $output = $this->sendCommand([0x04, 0x00, 0x00]);
-                    if ($ret[3] !== 0x01) {
+                    $ret = $this->sendCommand([0x04, 0x00, 0x00]);
+                    if (ord($ret[3]) !== 0x01) 
                         $output['status'] = "Error";
                     else
                         $output['status'] = "OK";
-                    break;
                     break;
                 default:
                     // TODO: report error
@@ -225,15 +251,15 @@ class RadioController {
             $output = $this->sendCommand("list\n");
         }
         
-        // TODO: parse $output
+        var_dump($output);
 
         // TODO: encode response message as json format to ajax
-        if (is_string($output) && json_decode($output) === null) {
-            echo json_encode([$output]);
-        } else {
-            echo "output is bytes array.";
-            var_dump($output);
-        }
+        // if (is_string($output) && json_decode($output) === null) {
+        //     echo json_encode([$output]);
+        // } else {
+        //     echo "output is bytes array.";
+        //     var_dump($output);
+        // }
     }
     
     public function __destruct() {
