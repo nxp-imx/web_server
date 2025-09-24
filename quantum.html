@@ -16,13 +16,6 @@
     <link rel="stylesheet" href="css/info.css">
     <link rel="stylesheet" href="css/nav.css">
     <link rel="stylesheet" href="css/quantum.css">
-    <style>
-        .disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-    </style>
-
     <title>Quantum Radio</title>
 
 </head>
@@ -87,6 +80,18 @@
                 <!-- Stations will be populated here -->
             </div>
         </div>
+        
+        <!-- Manual frequency input section -->
+        <div id="manual-tuning-box" class="box">
+            <div class="box-title">Manual Tuning</div>
+            <div class="manual-tuning-controls">
+                <div class="frequency-input-group">
+                    <label for="frequencyInput">Frequency (MHz):</label>
+                    <input type="number" id="frequencyInput" min="87.5" max="108" step="0.1" placeholder="e.g., 98.5">
+                </div>
+                <button id="selectFrequencyBtn" class="radio-btn">Select</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -100,6 +105,45 @@
         // Disable stop and reset buttons immediately
         $('#stopBtn').prop('disabled', true);
         $('#stopBtn').addClass('disabled');
+        
+        // Handle manual frequency selection
+        $('#selectFrequencyBtn').click(function() {
+            var frequencyMHz = $('#frequencyInput').val();
+            if (frequencyMHz && !isNaN(frequencyMHz)) {
+                // Convert MHz to Hz
+                var frequencyHz = Math.round(frequencyMHz * 1000000);
+                selectStationByFrequency(frequencyHz);
+            } else {
+                alert('Please enter a valid frequency value between 87.5 and 108 MHz');
+            }
+        });
+        
+        // Function to tune to a specific frequency
+        function selectStationByFrequency(frequency) {
+            // Update current station display
+            var frequencyMHz = (frequency / 1000000).toFixed(1);
+            $('#currentStation').text("Manual (" + frequencyMHz + " MHz)");
+            
+            // Remove active class from all station items
+            $('.station-item').removeClass('active');
+            
+            // Send command to tune to the frequency
+            $.ajax({
+                type: "GET",
+                url: "./php/radio.php?tune=" + frequency,
+                async: true,
+                dataType: "json",
+                success: function(data) {
+                    console.log("Tuned to frequency: " + frequency);
+                    if (data['status'] !== 'OK') {
+                        alert('Failed to tune to the specified frequency');
+                    }
+                },
+                error: function() {
+                    alert('Error occurred while tuning to the specified frequency');
+                }
+            });
+        }
         
         // Start radio
         $('#startBtn').click(function() {
@@ -143,11 +187,6 @@
                     currentStation = null;
                     $('#currentStation').text("None");
                     $('.station-item').removeClass('active');
-                    // Clear timer
-                    if (stationListInterval) {
-                        clearInterval(stationListInterval);
-                        stationListInterval = null;
-                    }
                     console.log(data);
                 }
             });
@@ -155,6 +194,16 @@
         
         // Reset radio
         $('#resetBtn').click(function() {
+            // Clear timer
+            if (stationListInterval) {
+                clearInterval(stationListInterval);
+                stationListInterval = null;
+            }
+            
+            // Clear station list immediately when reset button is clicked
+            $('#stationList').empty();
+            stations = [];
+
             $.ajax({
                 type: "GET",
                 url: "./php/radio.php?action=reset",
@@ -170,11 +219,6 @@
                     $('#startBtn').removeClass('disabled');
                     $('#stopBtn').prop('disabled', true);
                     $('#stopBtn').addClass('disabled');
-                    // Clear timer
-                    if (stationListInterval) {
-                        clearInterval(stationListInterval);
-                        stationListInterval = null;
-                    }
                     if (data['status'] == 'OK')
                         alert("Quantum Reset over.");
                     else
@@ -218,15 +262,7 @@
             }
             
             // Default stations for demonstration
-            return [
-                { id: 1, name: "NXP FM Radio", frequency: 98500000 },
-                { id: 2, name: "Quantum Hits", frequency: 102700000 },
-                { id: 3, name: "Classic Rock", frequency: 105300000 },
-                { id: 4, name: "News Network", frequency: 108900000 },
-                { id: 5, name: "Jazz Lounge", frequency: 88100000 },
-                { id: 6, name: "ABC", frequency: 88600000 },
-                { id: 7, name: "DEF", frequency: 88900000 },
-            ];
+            return [ ];
         }
         
         // Render station list
