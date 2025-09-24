@@ -9,7 +9,23 @@ class RadioController {
     private $socket = null;
     
     public function __construct() {
-        $this->connectToSocket();
+        // Check if quantum-tcp-server is running
+        // $pid = shell_exec("pgrep -f quantum-tcp-server");
+        // if (trim($pid ?? '') === "") {
+        //     $this->log_to_file("Start up quantum-tcp-server");
+        //     exec("nohup /root/quantum-field/quantum-tcp-server > /root/quantum-field/tcp-server.log 2>&1 &");
+        //     sleep(1);
+        // }
+
+
+        // $pid = shell_exec("pgrep -f quantum_main");
+        // if (trim($pid ?? '') === "") {
+        //     $this->log_to_file("Start up quantum_main");
+        //     exec("nohup bash -c 'cd /root/quantum-field && /root/quantum-field/quantum_main' > /root/quantum-field/quantum-main.log 2>&1 &");
+        //     sleep(4);
+        // }
+        
+        $this->log_to_file("prepare to connect to ux socket.");
     }
     
     // log
@@ -164,6 +180,13 @@ class RadioController {
         // Return byte array
         return $responseBytes;
     }
+
+    private function stop_audio_player() {
+        if (file_exists('/tmp/gst_launch.pid')) {
+            exec("kill -9 -$(cat /tmp/gst_launch.pid) 2>/dev/null");
+            unlink('/tmp/gst_launch.pid');
+        }
+    }
     
     public function handleRequest() {
         $output = [];
@@ -203,13 +226,16 @@ class RadioController {
                     $output['status'] = "OK";
                     break;
                 case 'stop':
-                    $ret = $this->sendCommand([0x00, 0x00, 0x00]);
-                    if (ord($ret[3]) !== 0x01) 
-                        $output['status'] = "Error";
-                    else
-                        $output['status'] = "OK";
+                    // $ret = $this->sendCommand([0x00, 0x00, 0x00]);
+                    // if (ord($ret[3]) !== 0x01) 
+                    //     $output['status'] = "Error";
+                    // else
+                    //     $output['status'] = "OK";
+                    $this->stop_audio_player();
+                    $output['status'] = "OK";
                     break;
                 case 'reset':
+                    $this->stop_audio_player();
                     $ret = $this->sendCommand([0x00, 0x00, 0x00]);
                     if (ord($ret[3]) !== 0x01) 
                         $output['status'] = "Error";
@@ -253,8 +279,12 @@ class RadioController {
             $ret = $this->sendCommand($cmd_array);
             if (ord($ret[3]) !== 0x01) 
                 $output['status'] = "Error";
-            else
+            else {
                 $output['status'] = "OK";
+                // Run audio playback command in background after setting status to OK
+                if (!file_exists('/tmp/gst_launch.pid'))
+                    exec("nohup /root/quantum-field/open_audio_player.sh > /root/quantum-field/audio.log 2>&1 &");
+            }
         } else {
             $this->log_to_file("Unknow request type");
         }

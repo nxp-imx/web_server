@@ -17,7 +17,10 @@
     <link rel="stylesheet" href="css/nav.css">
     <link rel="stylesheet" href="css/quantum.css">
     <style>
-        
+        .disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
     </style>
 
     <title>Quantum Radio</title>
@@ -91,23 +94,39 @@
         var radioStatus = "stopped";
         var currentStation = null;
         var stations = [];
-        
-        // Initialize radio
-        $(document).ready(function() {
-            updateStationList();
-            setInterval(updateStationList, 5000); // Update station list every 5 seconds
-        });
+        // timer ID
+        var stationListInterval = null;
+
+        // Disable stop and reset buttons immediately
+        $('#stopBtn').prop('disabled', true);
+        $('#stopBtn').addClass('disabled');
         
         // Start radio
         $('#startBtn').click(function() {
+            
             $.ajax({
                 type: "GET",
-                url: "./php/general_commands.php?command=sh /www/pages/web_server/sh/radio.sh start",
+                url: "./php/radio.php?action=start",
                 async: true,
                 dataType: "json",
                 success: function(data) {
                     radioStatus = "running";
-                    console.log("Radio started");
+                    // Disable start button after successful start
+                    $('#startBtn').prop('disabled', true);
+                    $('#startBtn').addClass('disabled');
+                    $('#stopBtn').prop('disabled', false);
+                    $('#stopBtn').removeClass('disabled');
+                    if (data['status'] == 'OK') {
+                        alert("Quantum started!");
+                        // Initialize radio
+                        updateStationList();
+                        stationListInterval = setInterval(updateStationList, 5000); // Update station list every 5 seconds
+                    } else
+                        alert("Qauntum started failed.");
+                    console.log(data);
+                },
+                error: function() {
+                    
                 }
             });
         });
@@ -116,7 +135,7 @@
         $('#stopBtn').click(function() {
             $.ajax({
                 type: "GET",
-                url: "./php/general_commands.php?command=sh /www/pages/web_server/sh/radio.sh stop",
+                url: "./php/radio.php?action=stop",
                 async: true,
                 dataType: "json",
                 success: function(data) {
@@ -124,7 +143,12 @@
                     currentStation = null;
                     $('#currentStation').text("None");
                     $('.station-item').removeClass('active');
-                    console.log("Radio stopped");
+                    // Clear timer
+                    if (stationListInterval) {
+                        clearInterval(stationListInterval);
+                        stationListInterval = null;
+                    }
+                    console.log(data);
                 }
             });
         });
@@ -133,7 +157,7 @@
         $('#resetBtn').click(function() {
             $.ajax({
                 type: "GET",
-                url: "./php/general_commands.php?command=sh /www/pages/web_server/sh/radio.sh reset",
+                url: "./php/radio.php?action=reset",
                 async: true,
                 dataType: "json",
                 success: function(data) {
@@ -141,7 +165,21 @@
                     currentStation = null;
                     $('#currentStation').text("None");
                     $('.station-item').removeClass('active');
-                    console.log("Radio reset");
+                    // Re-enable start button after reset
+                    $('#startBtn').prop('disabled', false);
+                    $('#startBtn').removeClass('disabled');
+                    $('#stopBtn').prop('disabled', true);
+                    $('#stopBtn').addClass('disabled');
+                    // Clear timer
+                    if (stationListInterval) {
+                        clearInterval(stationListInterval);
+                        stationListInterval = null;
+                    }
+                    if (data['status'] == 'OK')
+                        alert("Quantum Reset over.");
+                    else
+                        alert("Quantum Reset error.");
+                    console.log(data);
                 }
             });
         });
@@ -152,7 +190,7 @@
             // that interacts with a radio service
             $.ajax({
                 type: "GET",
-                url: "./php/general_commands.php?command=sh /www/pages/web_server/sh/radio.sh list",
+                url: "./php/radio.php?action=list",
                 async: true,
                 dataType: "json",
                 success: function(data) {
@@ -166,32 +204,28 @@
         function parseStations(data) {
             // This is a placeholder - in a real implementation, 
             // you would parse actual data from the radio service
-            if (data && data.length > 0) {
-                // Assuming data is an array of strings with station info
-                return data.map((item, index) => {
-                    // Try to parse as JSON if possible, otherwise create a default structure
-                    try {
-                        return JSON.parse(item);
-                    } catch (e) {
-                        // If parsing fails, create a default station object
-                        return {
-                            id: index,
-                            name: item || `Station ${index + 1}`,
-                            frequency: "0.0 MHz"
-                        };
-                    }
+            if (data && data.station_list && data.station_list.length > 0) {
+                // Parse the station_list from the provided format
+                return data.station_list.map((item, index) => {
+                    // Keep the original frequency value
+                    return {
+                        id: index,
+                        name: `Station ${index + 1}`,
+                        frequency: item.frequency, // Keep original frequency value
+                        quality: item.quality
+                    };
                 });
             }
             
             // Default stations for demonstration
             return [
-                { id: 1, name: "NXP FM Radio", frequency: "98.5 MHz" },
-                { id: 2, name: "Quantum Hits", frequency: "102.7 MHz" },
-                { id: 3, name: "Classic Rock", frequency: "105.3 MHz" },
-                { id: 4, name: "News Network", frequency: "108.9 MHz" },
-                { id: 5, name: "Jazz Lounge", frequency: "88.1 MHz" },
-                { id: 6, name: "ABC", frequency: "88.6 MHz" },
-                { id: 7, name: "DEF", frequency: "88.9 MHz" },
+                { id: 1, name: "NXP FM Radio", frequency: 98500000 },
+                { id: 2, name: "Quantum Hits", frequency: 102700000 },
+                { id: 3, name: "Classic Rock", frequency: 105300000 },
+                { id: 4, name: "News Network", frequency: 108900000 },
+                { id: 5, name: "Jazz Lounge", frequency: 88100000 },
+                { id: 6, name: "ABC", frequency: 88600000 },
+                { id: 7, name: "DEF", frequency: 88900000 },
             ];
         }
         
@@ -201,7 +235,14 @@
             stations.forEach(function(station) {
                 var activeClass = (currentStation && currentStation.id === station.id) ? 'active' : '';
                 listHtml += `<div class="station-item ${activeClass}" data-id="${station.id}">`;
-                listHtml += `<strong>${station.name}</strong> - ${station.frequency}`;
+                listHtml += `<div class="station-info">`;
+                // Convert frequency to MHz for display
+                const frequencyMHz = (station.frequency / 1000000).toFixed(1) + " MHz";
+                listHtml += `<strong>${station.name}</strong> - ${frequencyMHz}`;
+                listHtml += `</div>`;
+                listHtml += `<div class="station-quality">`;
+                listHtml += `Quality: ${station.quality || 'N/A'}`;
+                listHtml += `</div>`;
                 listHtml += `</div>`;
             });
             
@@ -219,18 +260,20 @@
             var station = stations.find(s => s.id == stationId);
             if (station) {
                 currentStation = station;
-                $('#currentStation').text(station.name + " (" + station.frequency + ")");
+                // Convert frequency to MHz for display
+                const frequencyMHz = (station.frequency / 1000000).toFixed(1) + " MHz";
+                $('#currentStation').text(station.name + " (" + frequencyMHz + ")");
                 $('.station-item').removeClass('active');
                 $(`.station-item[data-id="${stationId}"]`).addClass('active');
                 
-                // Send command to tune to the station
+                // Send command to tune to the station (using original frequency value)
                 $.ajax({
                     type: "GET",
-                    url: "./php/general_commands.php?command=sh /www/pages/web_server/sh/radio.sh tune " + stationId,
+                    url: "./php/radio.php?tune=" + station.frequency,
                     async: true,
                     dataType: "json",
                     success: function(data) {
-                        console.log("Tuned to station: " + station.name);
+                        console.log("Tuned to station: " + station.frequency);
                     }
                 });
             }
