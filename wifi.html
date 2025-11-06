@@ -155,6 +155,9 @@
 
         function proc_wifi_data(wifi_info_string) {
             var wifi_info_proc = []; 
+            var index;
+            var wifi_info_list = [];
+            var ssid_name;
             wifi_info_proc.splice(0); 
 
             for (var i = 0; i < wifi_info_string.length; i++) {
@@ -162,28 +165,15 @@
             }
 
             for (var i = wifi_info_proc.length - 1; i >= 0; i--) {
-                if (wifi_info_proc[i].indexOf('*AR Wired') != -1) {
-                    wifi_info_proc.splice(i, 1);
+                index = wifi_info_proc[i].indexOf('SSID:');
+                if (index != -1) {
+                    ssid_name = wifi_info_proc[i].split(':')[wifi_info_proc[i].split(':').length-1];
+                    if((!wifi_info_list.includes(ssid_name))&&(!ssid_name.includes('NULLNULL'))){
+                        wifi_info_list.push(ssid_name);
+                    }
                 }
             }
-
-            var wifi_info_list = [];
-            for (var i = 0; i < wifi_info_proc.length; i++) {
-                wifi_info_list.push(wifi_info_proc[i].split("wifi_"));
-            }
-
-            for (var i = 0; i < wifi_info_list.length; i++) {
-                wifi_info_list[i][0] = wifi_info_list[i][0].replace(/(\s*$)/g, "");
-            }
-
-            var wifi_list = []; 
-            for (var i = 0; i < wifi_info_list.length; i++) {
-                if (wifi_list.indexOf(wifi_info_list[i][0]) == -1) {
-                    wifi_list.push(wifi_info_list[i][0]);
-                }
-            }
-
-            return wifi_list;
+            return wifi_info_list;
         }
 
         function connect_wifi(wifi_name, wifi_pwd) {
@@ -200,7 +190,7 @@
                 },
                 complete: function(XHR, TextStatus) {
                     if (TextStatus == 'timeout') { 
-                        alert('Wait 10s until the page reconnect.\nOr swith to website XX.XX.XX.101.\n(XX.XX.XX is the network segment of your wlan.\n Check it on another device.)');
+                        alert('Wait 10s until the page reconnect.\nOr swith to website XX.XX.XX.XX.\n(XX.XX.XX.XX is the network ip address of your mlan0.\n Check it on another device.)');
                         $(loading).css("visibility", "hidden"); 
                     }
                 }
