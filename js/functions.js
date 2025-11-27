@@ -1,5 +1,19 @@
 //# Copyright 2023 NXP
 //# SPDX-License-Identifier: BSD-3-Clause
+var la_data =[0,0,0];
+var la_data_pre =[0,0,0];
+var la_dict ='0';
+var la_dict_pre ='0';
+var lo_data =[0,0,0];
+var lo_data_pre =[0,0,0];
+var lo_dict ='0';
+var lo_dict_pre ='0';
+var time_data  =[0,0,0];
+var time_data_pre =[0,0,0];
+var height_data = 0;
+var height_data_pre = 0;
+var sv_data = 0;
+var sv_data_pre = 0;
 
 function general_commands(command) {
     var data_recv;
@@ -335,14 +349,6 @@ function refresh_list() {
 function show_gnss_info() {
     var gnss_data;
     var ret_data =['0','0','0','0','0','0','0','0'];
-    var la_data =[0,0,0];
-    var la_dict ='0';
-    var lo_data =[0,0,0];
-    var lo_dict ='0';
-    var time_data  =[0,0,0];
-    var height_data = 0;
-    var sv_data = 0;
-
     gnss_data = cat_gnss_info();
 
     if((gnss_data == '') || (gnss_data.length < 2)){
@@ -351,20 +357,39 @@ function show_gnss_info() {
         ret_data =get_gnss_info(gnss_data, 1);
         if((ret_data[0] != '0')&&(ret_data[0] != '')){
             time_data = convert_time(ret_data[0]);
+            time_data_pre = time_data;
+        }else{
+            time_data = time_data_pre;
         }
         if((ret_data[1] != '0')&&(ret_data[1]!= '')){
             la_data = convert_lalo(ret_data[1]);
+            la_data_pre = la_data;
             la_dict = ret_data[2];
+            la_dict_pre = la_dict;
+        }else{
+            la_data = la_data_pre;
+            la_dict = la_dict_pre;
         }
         if((ret_data[3] != '0')&&(ret_data[3]!= '')){
             lo_data = convert_lalo(ret_data[3]);
+            lo_data_pre = lo_data;
             lo_dict = ret_data[4];
+            lo_dict_pre = lo_dict;
+        }else{
+            lo_data = lo_data_pre;
+            lo_dict = lo_dict_pre;
         }
         if((ret_data[6] != '0')&&(ret_data[6]!= '')){
             sv_data = ret_data[6];
+            sv_data_pre = sv_data;
+        }else{
+            sv_data= sv_data_pre;
         }
         if((ret_data[7] != '0')&&(ret_data[7]!= '')){
             height_data = ret_data[7];
+            height_data_pre = height_data;
+        }else{
+            height_data = height_data_pre;
         }
         
         document.getElementById("mTime").innerHTML = "Time : " + String(time_data[0]).padStart(2,'0')+":"+String(time_data[1]).padStart(2,'0')+":"+String(time_data[2]).padStart(2,'0');
