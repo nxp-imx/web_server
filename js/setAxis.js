@@ -246,7 +246,7 @@ setInterval(function() {
             data: xdata
         }],
         title: {
-            text: 'CPU2 usage',
+            text: 'CPU3 usage',
             textStyle: {
                 color: '#000000'
             },
@@ -272,7 +272,7 @@ setInterval(function() {
             left: '15%'
         },
         title: {
-            text: 'CPU3 usage',
+            text: 'CPU4 usage',
             textStyle: {
                 color: '#000000'
             },
