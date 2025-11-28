@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright 2023 NXP
+ * Copyright 2025 NXP
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -9,22 +9,6 @@ class RadioController {
     private $socket = null;
     
     public function __construct() {
-        // Check if quantum-tcp-server is running
-        // $pid = shell_exec("pgrep -f quantum-tcp-server");
-        // if (trim($pid ?? '') === "") {
-        //     $this->log_to_file("Start up quantum-tcp-server");
-        //     exec("nohup /root/quantum-field/quantum-tcp-server > /root/quantum-field/tcp-server.log 2>&1 &");
-        //     sleep(1);
-        // }
-
-
-        // $pid = shell_exec("pgrep -f quantum_main");
-        // if (trim($pid ?? '') === "") {
-        //     $this->log_to_file("Start up quantum_main");
-        //     exec("nohup bash -c 'cd /root/quantum-field && /root/quantum-field/quantum_main' > /root/quantum-field/quantum-main.log 2>&1 &");
-        //     sleep(4);
-        // }
-        
         $this->log_to_file("prepare to connect to ux socket.");
     }
     
@@ -226,11 +210,6 @@ class RadioController {
                     $output['status'] = "OK";
                     break;
                 case 'stop':
-                    // $ret = $this->sendCommand([0x00, 0x00, 0x00]);
-                    // if (ord($ret[3]) !== 0x01) 
-                    //     $output['status'] = "Error";
-                    // else
-                    //     $output['status'] = "OK";
                     $this->stop_audio_player();
                     $output['status'] = "OK";
                     break;
