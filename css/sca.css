@@ -85,7 +85,17 @@
         border-radius: 50%;
         top: 0;
         left: 0;
-      }
+    }
+    #red-round {
+        position: absolute;
+        top: 5vh;
+        left: 25vh;
+    }
+    #yellow-round {
+        position: absolute;
+        top: 5vh;
+        left: 25vh;
+    }
     #controls {
         position: fixed;
         top: 10px;

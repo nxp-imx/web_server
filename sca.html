@@ -81,14 +81,12 @@
     <div class="charts-container">
         <div id="boxup" class="box-sca">
             <div id="sca-car" class="box-sca" ><img src="img/pictures/car.png" style="height: 10vh; width: 24vh; "/></div>
-            <div id="dot"></div>
+            <div id="red-round" hidden ><img src="img/pictures/red.png" style="height: 50vh; width: 50vh;"  /></div>
+            <div id="yellow-round" hidden ><img src="img/pictures/yellow.png" style="height: 50vh; width: 50vh;"  /></div>
         </div>
         <div class="box-sca">
             <div id="boxdown" class="box-sca">
                 <div id="chart-distance" class="chart"></div>
-            </div>
-            <div id="boxRssi" class="box-sca">
-                <div id="chart-rssi" class="chart"></div>
             </div>
         </div>
     </div>
@@ -165,77 +163,6 @@
 
         myChart_distance.setOption(option_distance);
         window.addEventListener('resize', myChart_distance.resize);
-        //////////////////////////////////////////////////////////////
-        var myChart_rssi = echarts.init(document.getElementById('chart-rssi'), null, {
-            renderer: 'canvas',
-            useDirtyRect: false
-        });
-
-        //define chart's option
-        var option_rssi = {
-            color: '#fcb316',
-            backgroundColor: 'rgba(0,0,0,0)',
-            tooltip: {
-                trigger: 'axis'
-            },
-            calculable: true,
-            xAxis: [{
-                type: 'category',
-                boundaryGap: false,
-                axisLine: {
-                    lineStyle: {
-                        type: 'solid',
-                        color: '#000000',
-                        width: '4'
-                    }
-                },
-                axisLabel: {
-                    textStyle: {
-                        color: '#000000'
-                    }
-                },
-                spiltLine: {
-                    show: true,
-                    lineStyle: {
-                        color: ['#000000']
-                    }
-                },
-                data: xtime
-            }],
-            yAxis: [{
-                type: 'value',
-                name: 'RSSI/dBm',
-                max: 0,
-                min: -100,
-                axisLabel: {
-                    formatter: '{value}',
-                    textStyle: {
-                        color: '#000000'
-                    }
-                },
-                axisLine: {
-                    lineStyle: {
-                        type: 'solid',
-                        color: '#000000',
-                        width: '4'
-                    }
-                },
-                spiltLine: {
-                    show: true,
-                    lineStyle: {
-                        color: ['#000000']
-                    }
-                }
-            }],
-            grid: {
-                top: '15%',
-                bottom: '15%',
-                left: '15%'
-            },
-        };
-
-        myChart_rssi.setOption(option_rssi);
-        window.addEventListener('resize', myChart_rssi.resize);
     </script>
 </body>
 </html>
