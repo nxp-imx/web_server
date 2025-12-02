@@ -1,5 +1,6 @@
-# Copyright 2023 NXP
 # SPDX-License-Identifier: BSD-3-Clause
+# Copyright 2025 NXP
+
 #three status：1.no paired device；2.has paired device but not connect；3.device connected
 devnumber=$(bluetoothctl devices Paired | awk -F ' ' '{print $2}') 
 sleep 5

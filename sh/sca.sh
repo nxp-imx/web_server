@@ -1,4 +1,7 @@
 #!/bin/bash
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright 2025 NXP
+
 function sca_init(){
     killall cat
     stty -F /dev/ttyLP4 115200 cs8 -parenb -cstopb raw -echo -echoe -echok -echoctl -echoke

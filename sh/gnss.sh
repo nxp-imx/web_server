@@ -1,4 +1,7 @@
 #!/bin/bash
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright 2025 NXP
+
 function gnss_init(){
     i2ctransfer -y 3 w37@0x42 0xb5 0x62 0x06 0x8a \
         0x1d 0x00 \
