@@ -6,7 +6,7 @@
     $wifi_name=$_GET["wifi_name"];
     $wifi_pwd=$_GET["wifi_pwd"];
     exec("sh /www/pages/web_server/sh/create_wifi_conf.sh");
-    exec("wpa_passphrase ".$wifi_name." ".$wifi_pwd." >> /etc/wpa_supplicant/wpa_supplicant.conf");
+    exec("wpa_passphrase ".escapeshellarg($wifi_name)." ".$wifi_pwd." >> /etc/wpa_supplicant/wpa_supplicant.conf");
     exec("sh /www/pages/web_server/sh/wifi_connect.sh");
     exec('ifconfig',$output);
     echo json_encode($output);

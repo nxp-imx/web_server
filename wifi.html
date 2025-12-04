@@ -173,7 +173,7 @@
             for (var i = wifi_info_proc.length - 1; i >= 0; i--) {
                 index = wifi_info_proc[i].indexOf('SSID:');
                 if (index != -1) {
-                    ssid_name = wifi_info_proc[i].split(':')[wifi_info_proc[i].split(':').length-1];
+                    ssid_name = wifi_info_proc[i].split(':')[wifi_info_proc[i].split(':').length-1].trim();
                     if((!wifi_info_list.includes(ssid_name))&&(!ssid_name.includes('NULLNULL'))){
                         wifi_info_list.push(ssid_name);
                     }
@@ -182,14 +182,18 @@
             return wifi_info_list;
         }
 
-        function connect_wifi(wifi_name, wifi_pwd) {
+        function connect_wifi(ssid, pwd) {
             $(loading).css("visibility", "visible");
             // alert("Please turn to the website:xx.xx.xx.101/web_server/index.html(xx.xx.xx is the network segment of your wlan. Check it on other devices.)");
             $.ajax({
                 type: "GET",
-                url: "./php/wifi_connect.php?wifi_name=" + wifi_name + " &wifi_pwd=" + wifi_pwd,
+                url: "./php/wifi_connect.php",
                 async: true,
                 dataType: "json",
+                data:{
+                    wifi_name: ssid,
+                    wifi_pwd: pwd
+                },
                 timeout: 5000,
                 success: function(data) {
                     $(loading).css("visibility", "hidden"); 
