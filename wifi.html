@@ -190,13 +190,13 @@
                 url: "./php/wifi_connect.php?wifi_name=" + wifi_name + " &wifi_pwd=" + wifi_pwd,
                 async: true,
                 dataType: "json",
-                timeout: 8000, 
+                timeout: 5000,
                 success: function(data) {
                     $(loading).css("visibility", "hidden"); 
                 },
                 complete: function(XHR, TextStatus) {
                     if (TextStatus == 'timeout') { 
-                        alert('Wait 10s until the page reconnect.\nOr swith to website XX.XX.XX.XX.\n(XX.XX.XX.XX is the network ip address of your mlan0.\n Check it on another device.)');
+                        alert('Please check the IP address of mlan0 in Orangebox2 \n Using command : ifconfig \n If it connects failed, scan and connect again!');
                         $(loading).css("visibility", "hidden"); 
                     }
                 }

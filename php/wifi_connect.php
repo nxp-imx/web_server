@@ -8,4 +8,6 @@
     exec("sh /www/pages/web_server/sh/create_wifi_conf.sh");
     exec("wpa_passphrase ".$wifi_name." ".$wifi_pwd." >> /etc/wpa_supplicant/wpa_supplicant.conf");
     exec("sh /www/pages/web_server/sh/wifi_connect.sh");
+    exec('ifconfig',$output);
+    echo json_encode($output);
 ?>
