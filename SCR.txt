@@ -1,9 +1,17 @@
+NXP Software Content Register
+
+Release - ob2-2.0.0
+December 2025
+
+Outgoing License: LA_OPT_Online Code Hosting NXP_Software_License - v1.4 May 2025
+License File:     LICENSE.txt
+
 --------------------------------------------
 
 Package:                   Orangebox web_server release
-Version:                   v2.0
+Version:                   ob2-2.0.0
 Date:                      December 2025
-Outgoing License:          LA_OPT_NXP_Software_License v60 Feb 2025 - Additional distribution license granted - Section 2.3 applies
+Outgoing License:          LA_OPT_Online Code Hosting NXP_Software_License - v1.4 May 2025
 License File:              LICENSE.txt
 Type of content:           Source code
 Description and comments:  Web UI for OrangeBox
