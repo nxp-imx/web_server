@@ -23,34 +23,39 @@ send -- "discoverable on\r"
 expect "\[bluetooth\]"
 
 puts "Start BT connection with $bt_dev_mac"
-send -- "connect $bt_dev_mac\r"
+send -- "pair $bt_dev_mac\r"
+
+puts "Start BT connection with $bt_dev_mac"
+
 
 expect {
     "Enter PIN code" {
         send -- "1234\r"
+        expect "Pairing successful"
+        send -- "connect $bt_dev_mac\r"
         expect "Connection successful"
-
         send -- "scan off\r"
         send -- "trust $bt_dev_mac\r"
         send -- "quit\r"
-        echo "connect successfully"
+        puts "connect successfully"
         expect eof
     }
 
     "Confirm passkey" { 
-        sleep 1; 
-        send -- "yes\r"; 
+        sleep 1;
+        send -- "yes\r";
+        expect "Pairing successful"
+        sleep 1;
+        send -- "connect $bt_dev_mac\r"
         expect "Connection successful"
         send -- "scan off\r"
-        send -- "trust $bt_dev_mac\r"
         send -- "quit\r"
-        echo "connect successfully"
+        puts "connect successfully"
         expect eof
-        
     }
     "not available" {
         send -- "quit\r"
-        echo "not available"
+        puts "not available"
         expect eof
     }
 }

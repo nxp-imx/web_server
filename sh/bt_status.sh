@@ -3,7 +3,7 @@
 
 #three status：1.no paired device；2.has paired device but not connect；3.device connected
 devnumber=$(bluetoothctl devices Paired | awk -F ' ' '{print $2}') 
-sleep 5
+sleep 1
 if [ ! -n "$devnumber" ]; then
     echo "status 1"
     echo "There is no paired device"
