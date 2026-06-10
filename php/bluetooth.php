@@ -10,8 +10,8 @@
     exec('bluetoothctl pairable on');
     exec('bluetoothctl default-agent');
     exec('bluetoothctl agent on'); 
-    exec('bluetoothctl --timeout 10 scan on');   //scan devices for 10 seconds and stop.
+    $output = [];
+    exec('sh /www/pages/web_server/sh/scan_bt_devices.sh', $output);   //scan devices
 
-    exec('bluetoothctl devices',$output);   //Show the devices scanned and trans them to Website
     echo json_encode($output);
 ?>
