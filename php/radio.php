@@ -5,7 +5,7 @@
  */
 
 class RadioController {
-    private $socketPath = '/tmp/quantum_unix.sock';
+    private $socketPath = '/run/quantum_unix.sock';
     private $socket = null;
     
     public function __construct() {
@@ -166,9 +166,9 @@ class RadioController {
     }
 
     private function stop_audio_player() {
-        if (file_exists('/tmp/gst_launch.pid')) {
-            exec("kill -9 -$(cat /tmp/gst_launch.pid) 2>/dev/null");
-            unlink('/tmp/gst_launch.pid');
+        if (file_exists('/run/gst_launch.pid')) {
+            exec("kill -9 -$(cat /run/gst_launch.pid) 2>/dev/null");
+            unlink('/run/gst_launch.pid');
         }
     }
     
@@ -261,8 +261,8 @@ class RadioController {
             else {
                 $output['status'] = "OK";
                 // Run audio playback command in background after setting status to OK
-                if (!file_exists('/tmp/gst_launch.pid'))
-                    exec("nohup /root/quantum-field/open_audio_player.sh > /root/quantum-field/audio.log 2>&1 &");
+                if (!file_exists('/run/gst_launch.pid'))
+                    exec("nohup bash /www/pages/web_server/sh/open_audio_player.sh > /run/audio.log 2>&1 &");
             }
         } else {
             $this->log_to_file("Unknow request type");
