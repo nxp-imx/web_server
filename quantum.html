@@ -76,7 +76,7 @@
     </div>
     
     <div class="current-station">
-        Current Station: <span id="currentStation">None</span>
+        Status: <span id="currentStation">None</span>
     </div>
     
     <div class="charts-container">
@@ -153,17 +153,24 @@
         
         // Start radio
         $('#startBtn').click(function() {
-            
+            $('#startBtn').prop('disabled', true);
+            $('#startBtn').addClass('disabled');
+            $('#resetBtn').prop('disabled', true);
+            $('#resetBtn').addClass('disabled');
+            $('#currentStation').text("Booting ...");
+
             $.ajax({
                 type: "GET",
                 url: "./php/radio.php?action=start",
                 async: true,
                 dataType: "json",
                 success: function(data) {
+                    $('#resetBtn').prop('disabled', false);
+                    $('#resetBtn').removeClass('disabled');
+                    $('#currentStation').text("Booted");
+
                     radioStatus = "running";
                     // Disable start button after successful start
-                    $('#startBtn').prop('disabled', true);
-                    $('#startBtn').addClass('disabled');
                     $('#stopBtn').prop('disabled', false);
                     $('#stopBtn').removeClass('disabled');
                     if (data['status'] == 'OK') {
@@ -171,12 +178,20 @@
                         // Initialize radio
                         updateStationList();
                         stationListInterval = setInterval(updateStationList, 5000); // Update station list every 5 seconds
-                    } else
+                    } else {
                         alert("Qauntum started failed.");
+                        $('#startBtn').prop('disabled', false);
+                        $('#startBtn').removeClass('disabled');
+                    }
                     console.log(data);
                 },
                 error: function() {
-                    
+                    $('#startBtn').prop('disabled', false);
+                    $('#startBtn').removeClass('disabled');
+                    $('#resetBtn').prop('disabled', false);
+                    $('#resetBtn').removeClass('disabled');
+                    $('#currentStation').text("None");
+                    alert("Request failed.");
                 }
             });
         });
@@ -200,6 +215,11 @@
         
         // Reset radio
         $('#resetBtn').click(function() {
+            $('#startBtn').prop('disabled', true);
+            $('#startBtn').addClass('disabled');
+            $('#resetBtn').prop('disabled', true);
+            $('#resetBtn').addClass('disabled');
+            $('#currentStation').text("Reseting ...");
             // Clear timer
             if (stationListInterval) {
                 clearInterval(stationListInterval);
@@ -225,11 +245,21 @@
                     $('#startBtn').removeClass('disabled');
                     $('#stopBtn').prop('disabled', true);
                     $('#stopBtn').addClass('disabled');
+                    $('#resetBtn').prop('disabled', false);
+                    $('#resetBtn').removeClass('disabled');
                     if (data['status'] == 'OK')
                         alert("Quantum Reset over.");
                     else
                         alert("Quantum Reset error.");
                     console.log(data);
+                },
+                error: function() {
+                    $('#startBtn').prop('disabled', false);
+                    $('#startBtn').removeClass('disabled');
+                    $('#resetBtn').prop('disabled', false);
+                    $('#resetBtn').removeClass('disabled');
+                    $('#currentStation').text("None");
+                    alert("Request failed.");
                 }
             });
         });
