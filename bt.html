@@ -216,7 +216,7 @@
                 first_init = 1;
                 check_status();
             }
-            if(status == 'status 1'){
+            if(status == 'status_1'){
                     $(loading).css("visibility", "visible");
 
                     $.ajax({
@@ -260,7 +260,7 @@
                 }
             });
             
-            status = 'status 3';
+            status = 'status_3';
             check_status();
         }
 
@@ -294,7 +294,7 @@
                 });
                 $.ajax({
                     type: "GET",
-                    url: "./php/general_commands.php?command=bluetoothctl show",
+                    url: "./php/bt_show.php",
                     async: false,
                     dataType: "json",
                     success: function(data) {
@@ -315,36 +315,12 @@
                 }
             });
 
-            if (status == 'status 1') {
+            if (status == 'status_1') {
                 document.getElementById('status1').style.display = 'flex';
                 document.getElementById('status2').style.display = 'none';
                 document.getElementById('status3').style.display = 'none';
     
-                checkbox_power = document.getElementById('check-power');
-                checkbox_discoverable = document.getElementById('check-discoverable');
-                check_checkbox_status();
-
-                setInterval(function() {
-                    check_checkbox_status();
-                }, 5000);
-
-                checkbox_power.addEventListener('change', (event) => {
-                    if (document.getElementById('check-power').checked == true) {
-                        general_commands('bluetoothctl power on');
-                    } else {
-                        general_commands('bluetoothctl power off');
-                    }
-                });
-
-                checkbox_discoverable.addEventListener('change', (event) => {
-                    if (document.getElementById('check-discoverable').checked == true) {
-                        general_commands('bluetoothctl discoverable on');
-                    } else {
-                        general_commands('bluetoothctl discoverable off');
-                    }
-                });
-
-            } else if (status == 'status 2') {
+            } else if (status == 'status_2') {
                 document.getElementById('status1').style.display = 'none';
                 document.getElementById('status2').style.display = 'flex';
                 document.getElementById('status3').style.display = 'none';
@@ -360,7 +336,7 @@
                         }
                     }
                 });
-            } else if (status == 'status 3') {
+            } else if (status == 'status_3') {
                 document.getElementById('status1').style.display = 'none';
                 document.getElementById('status2').style.display = 'none';
                 document.getElementById('status3').style.display = 'flex';
@@ -378,22 +354,6 @@
                 });
             } else {
                 console.log('error');
-            }
-        }
-
-        function check_checkbox_status() {
-
-            //Check status and change the input
-            if (btinfo[4].replace('\tPowered: ', '') == 'yes') {
-                document.getElementById('check-power').checked = true;
-            } else {
-                document.getElementById('check-power').checked = false;
-            }
-
-            if (btinfo[5].replace('\tDiscoverable: ', '') == 'yes') {
-                document.getElementById('check-discoverable').checked = true;
-            } else {
-                document.getElementById('check-discoverable').checked = false;
             }
         }
 

@@ -1,19 +1,31 @@
-# SPDX-License-Identifier: BSD-3-Clause
+#!/bin/bash
 # Copyright 2025 NXP
 
-#three status：1.no paired device；2.has paired device but not connect；3.device connected
-devnumber=$(bluetoothctl devices Paired | awk -F ' ' '{print $2}') 
+# three status:
+# status1. no paired device
+# status2. has paired device but not connected
+# status3. device connected
+
+devnumber=$(echo "devices Paired" | bluetoothctl | awk '/Device/ {print $2; exit}')
+
 sleep 1
-if [ ! -n "$devnumber" ]; then
-    echo "status 1"
-    echo "There is no paired device"
+
+if [ -z "$devnumber" ]; then
+    echo "status_1"
+    echo "msg=There is no paired device"
+    exit 1
 else
-    status=$(bluetoothctl info $devnumber | grep Connected | awk -F ' ' '{print $2}')
-    if [[ $status = "no" ]] ; then
-        echo "status 2"
-        echo "paired but not connected"
+    status=$(echo "info $devnumber" | bluetoothctl | awk '/Connected:/ {print $2}')
+
+    if [ "$status" = "yes" ]; then
+        echo "status_3"
+        echo "device=$devnumber"
+        echo "msg=connected"
+        exit 0
     else
-        echo "status 3"
-        echo "connected"
+        echo "status_2"
+        echo "device=$devnumber"
+        echo "msg=paired but not connected"
+        exit 2
     fi
 fi
