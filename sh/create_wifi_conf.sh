@@ -1,12 +1,12 @@
+#!/bin/sh
 # Copyright 2023 NXP
 # SPDX-License-Identifier: BSD-3-Clause
-if [ ! -d "/etc/wpa_supplicant" ]; then
-  mkdir /etc/wpa_supplicant
-fi
+set -e
 
-if [ -f "/etc/wpa_supplicant/wpa_supplicant.conf" ]; then
-  rm /etc/wpa_supplicant/wpa_supplicant.conf
-fi
+CONF_DIR="/run/webui"
+CONF_FILE="${CONF_DIR}/wpa_supplicant.conf"
 
-touch /etc/wpa_supplicant/wpa_supplicant.conf
+rm -f "${CONF_FILE}"
+touch "${CONF_FILE}"
 
+exit 0
