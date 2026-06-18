@@ -262,7 +262,13 @@ class RadioController {
                 $output['status'] = "OK";
                 // Run audio playback command in background after setting status to OK
                 if (!file_exists('/run/gst_launch.pid'))
-                    exec("nohup bash /www/pages/web_server/sh/open_audio_player.sh > /run/audio.log 2>&1 &");
+                    exec('setsid bash -c \''
+                        . 'export XDG_RUNTIME_DIR=/run/user/0;'
+                        . 'export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/0/bus;'
+                        . 'echo $$ > /run/gst_launch.pid;'
+                        . 'arecord -D hw:qtmradiocard,0 -f S32_LE -r 48000 -c 1 -t wav |'
+                        . 'gst-launch-1.0 fdsrc ! wavparse ! volume volume=0.5 ! autoaudiosink'
+                        . '\' > /run/audio.log 2>&1 &');
             }
         } else {
             $this->log_to_file("Unknow request type");
