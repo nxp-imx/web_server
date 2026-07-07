@@ -158,7 +158,7 @@
             $(loading).css("visibility", "visible");
             $.ajax({
                 type: "GET",
-                url: "./php/scan_v2.php",
+                url: "./php/wifi_manager.php?action=scan",
                 async: true,
                 dataType: "json",
                 success: function(data) {
@@ -202,53 +202,109 @@
         }
 
         function connect_wifi(ssid, pwd) {
-            var i=0;
-            var connect_status=0
-            $(loading).css("visibility", "visible");
+        var i = 0;
+        var connect_status = 0;
+        var current_ssid = "";
+        $(loading).css("visibility", "visible");
+
+        // Step 1: check current connect status
+        $.ajax({
+            type: "GET",
+            url: "./php/wifi_manager.php?action=status",
+            async: true,
+            dataType: "json",
+            success: function(data) {
+                console.log("Current status:", data);
+                // connected?
+                if (data.status === "ok" && data.connected && data.ssid) {
+                    connect_status = 1;
+                    current_ssid = data.ssid;
+                    console.log("Currently connected to:", current_ssid);
+                } else {
+                    connect_status = 0;
+                    console.log("Not connected");
+                }
+                // Step 2: whether need to connect
+                if (connect_status == 1 && current_ssid === ssid) {
+                    alert('Already connected to ' + ssid + '!');
+                    $(loading).css("visibility", "hidden");
+                    console.log("Already connected to target network, skip connection");
+                } else if (connect_status == 1 && current_ssid !== ssid) {
+                    console.log("Connected to different network, disconnecting first...");
+                    // Step 3: disconnect current AP
+                    $.ajax({
+                        type: "GET",
+                        url: "./php/wifi_manager.php?action=disconnect",
+                        async: true,
+                        dataType: "json",
+                        success: function(disconnect_data) {
+                            console.log("Disconnect result:", disconnect_data);
+                            if (disconnect_data.status === "ok") {
+                                console.log("Disconnected successfully, now connecting to new network...");
+                                setTimeout(function() {
+                                    connectToNewNetwork(ssid, pwd);
+                                }, 2000);
+                            } else {
+                                alert('Failed to disconnect from current network!');
+                                $(loading).css("visibility", "hidden");
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Disconnect error:", error);
+                            alert('Disconnect error: ' + error);
+                            $(loading).css("visibility", "hidden");
+                        }
+                    });
+                } else {
+                    console.log("Not connected, connecting to new network...");
+                    connectToNewNetwork(ssid, pwd);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Status check error:", error);
+                console.log("Status check failed, trying to connect anyway...");
+                connectToNewNetwork(ssid, pwd);
+            }
+        });
+        // connect to new network
+        function connectToNewNetwork(ssid, pwd) {
             $.ajax({
                 type: "GET",
-                url: "./php/wifi_connect_check.php",
+                url: "./php/wifi_manager.php?action=connect",
                 async: true,
                 dataType: "json",
+                data: {
+                    wifi_name: ssid,
+                    wifi_pwd: pwd
+                },
+                timeout: 15000,
                 success: function(data) {
-                    for (i = 0; i < data.length; i++) {
-                        if(data[i].indexOf("Connected to")==-1){
-                            console.log("No Connected");
-                            continue;
-                        }else{
-                            console.log("connected");
-                            connect_status=1;
-                            break;
-                        }
-                    }
-                    if(connect_status==0){
-                        $.ajax({
-                            type: "GET",
-                            url: "./php/wifi_connect.php",
-                            async: true,
-                            dataType: "json",
-                            data:{
-                                wifi_name: ssid,
-                                wifi_pwd: pwd
-                            },
-                            timeout: 5000,
-                            success: function(data) {
-                                $(loading).css("visibility", "hidden"); 
-                            },
-                            complete: function(XHR, TextStatus) {
-                                if (TextStatus == 'timeout') {
-                                    alert('Please check the IP address of mlan0 on OB2 \n If connect failed, scan and connect again!');
-                                    $(loading).css("visibility", "hidden");
-                                }
-                            }
-                        });
+                    console.log("Connect result:", data);
+                    if (data.status === "ok") {
+                        alert('Connecting to ' + ssid + '...\nPlease wait a moment and check the connection status.');
                     } else {
-                        alert('Had connected to an AP!');
+                        alert('Connection failed: ' + (data.msg || data.step));
+                    }
+                    $(loading).css("visibility", "hidden");
+                },
+                error: function(xhr, status, error) {
+                    console.error("Connect error:", error);
+                    if (status === 'timeout') {
+                        alert('Connection timeout!\nPlease check the IP address of mlan0 on OB2\nIf connect failed, scan and connect again!');
+                    } else {
+                        alert('Connection error: ' + error);
+                    }
+                    $(loading).css("visibility", "hidden");
+                },
+                complete: function(XHR, TextStatus) {
+                    if (TextStatus == 'timeout') {
+                        alert('Please check the IP address of mlan0 on OB2\nIf connect failed, scan and connect again!');
                         $(loading).css("visibility", "hidden");
                     }
-                },
+                }
             });
         }
+    }
     </script>
 
 </body>
