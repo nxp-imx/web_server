@@ -3,21 +3,26 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 set bt_dev_mac  [lindex $argv 0]
-
 puts "Connecting to $bt_dev_mac"
 
-set timeout -1
+set timeout 30
+spawn bluetoothctl
 
-spawn "bluetoothctl"
 expect "\[bluetooth\]"
-
 sleep 2
 
 send -- "agent on\r"
-expect "Agent is already registered"
+expect {
+    "Agent is already registered" {}
+    "Agent registered" {}
+    timeout { puts "Agent setup timeout" }
+}
 
 send -- "default-agent\r"
-expect "Default agent request successful"
+expect {
+    "Default agent request successful" {}
+    timeout { puts "Default agent timeout" }
+}
 
 send -- "discoverable on\r"
 expect "\[bluetooth\]"
@@ -25,11 +30,9 @@ expect "\[bluetooth\]"
 puts "Start BT connection with $bt_dev_mac"
 send -- "pair $bt_dev_mac\r"
 
-puts "Start BT connection with $bt_dev_mac"
-
-
 expect {
     "Enter PIN code" {
+        puts "PIN code authentication"
         send -- "1234\r"
         expect "Pairing successful"
         send -- "connect $bt_dev_mac\r"
@@ -40,27 +43,57 @@ expect {
         puts "connect successfully"
         expect eof
     }
-
-    "Confirm passkey" { 
-        sleep 1;
-        send -- "yes\r";
+    "Confirm passkey" {
+        puts "Passkey confirmation"
+        sleep 1
+        send -- "yes\r"
         expect "Pairing successful"
-        sleep 1;
+        sleep 1
         send -- "connect $bt_dev_mac\r"
         expect "Connection successful"
         send -- "scan off\r"
+        send -- "trust $bt_dev_mac\r"
         send -- "quit\r"
         puts "connect successfully"
         expect eof
     }
+    "Pairing successful" {
+        puts "SSP pairing (no PIN/passkey required)"
+        sleep 1
+        send -- "connect $bt_dev_mac\r"
+        expect {
+            "Connection successful" {
+                send -- "scan off\r"
+                send -- "trust $bt_dev_mac\r"
+                send -- "quit\r"
+                puts "connect successfully"
+                expect eof
+            }
+            "Failed to connect" {
+                puts "Connection failed after pairing"
+                send -- "quit\r"
+                expect eof
+            }
+            timeout {
+                puts "Connection timeout"
+                send -- "quit\r"
+                expect eof
+            }
+        }
+    }
     "not available" {
         send -- "quit\r"
-        puts "not available"
+        puts "Device not available"
+        expect eof
+    }
+    "Failed to pair" {
+        send -- "quit\r"
+        puts "Pairing failed"
+        expect eof
+    }
+    timeout {
+        send -- "quit\r"
+        puts "Pairing timeout"
         expect eof
     }
 }
-
-
-
-
-
