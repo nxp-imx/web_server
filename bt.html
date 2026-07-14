@@ -221,7 +221,7 @@
 
                     $.ajax({
                         type: "GET",
-                        url: "./php/bluetooth.php",
+                        url: "./php/bt_manager.php?action=scan",
                         async: true,
                         dataType: "json",
                         success: function(data) {
@@ -252,7 +252,7 @@
             var bt_id = Array.from(bt_list.keys())[document.getElementById('select_bt_name').value]
             $.ajax({
                 type: "GET",
-                url: "./php/bt_connect.php?bt_id=" + bt_id,
+                url: "./php/bt_manager.php?action=connect&bt_id=" + bt_id,
                 async: false,
                 dataType: "json",
                 success: function(data) {
@@ -294,7 +294,7 @@
                 });
                 $.ajax({
                     type: "GET",
-                    url: "./php/bt_show.php",
+                    url: "./php/bt_manager.php?action=show",
                     async: false,
                     dataType: "json",
                     success: function(data) {
@@ -327,7 +327,7 @@
 
                 $.ajax({
                     type: "GET",
-                    url: "./php/bt_connection_info.php",
+                    url: "./php/bt_manager.php?action=connection_info",
                     async: false,
                     dataType: "json",
                     success: function(data) {
@@ -343,7 +343,7 @@
 
                 $.ajax({
                     type: "GET",
-                    url: "./php/bt_connection_info.php",
+                    url: "./php/bt_manager.php?action=connection_info",
                     async: false,
                     dataType: "json",
                     success: function(data) {
