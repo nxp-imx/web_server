@@ -92,20 +92,51 @@
 
 
     <script>
+        var currentCwd = "";
+
+        // Reset session cwd to /root on page load, then fetch initial cwd
+        $.ajax({
+            type: "GET",
+            url: "./php/terminal.php?reset=1&command=" + encodeURIComponent("pwd"),
+            async: false,
+            dataType: "json",
+            success: function(data) {
+                if (data.cwd !== undefined) currentCwd = data.cwd;
+            }
+        });
+
+        function getPrompt() {
+            var home = "/root";
+            var dir = currentCwd;
+            if (dir.indexOf(home) === 0) {
+                dir = "~" + dir.substring(home.length);
+            }
+            return dir + "$ ";
+        }
+
         function terminal(command) {
             document.getElementById("command_input").value = ''; //clear input
 
+            var prompt = getPrompt();
             $.ajax({
                 type: "GET",
-                url: "./php/general_commands.php?command=" + command,
+                url: "./php/terminal.php?command=" + encodeURIComponent(command),
                 async: true,
                 dataType: "json",
                 success: function(data) {
-                    document.getElementById("output").append("$ " + command+ "\r\n");
-                    for(var i=0;i< Object.keys(data).length;i++)
-                    {
-                        document.getElementById("output").append(data[i] + "\r\n");
+                    var out = document.getElementById("output");
+                    if (data.clear === true) {
+                        out.value = "";
+                    } else {
+                        out.value += prompt + command + "\r\n";
+                        var lines = data.output !== undefined ? data.output : data;
+                        for(var i=0;i< lines.length;i++)
+                        {
+                            out.value += lines[i] + "\r\n";
+                        }
                     }
+                    if (data.cwd !== undefined) currentCwd = data.cwd;
+                    out.scrollTop = out.scrollHeight;
                 }
             });
         }
