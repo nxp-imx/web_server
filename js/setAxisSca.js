@@ -27,6 +27,18 @@ var max_value =100;
 var min_dis=0,min_dis_pre=0;
 var max_rssi=0,max_rssi_pre=0;
 var reset_status=0;
+var sca_starting=false;
+var myChart_distance = null;
+
+function getChart() {
+    if (!myChart_distance) {
+        myChart_distance = echarts.init(document.getElementById('chart-distance'), null, {
+            renderer: 'canvas',
+            useDirtyRect: false
+        });
+    }
+    return myChart_distance;
+}
 
 function UpdateData() {
     //update time
@@ -61,6 +73,11 @@ function UpdateData() {
 }
 
 function start_sca() {
+    if (sca_starting) {
+        console.log("sca start already in progress, ignoring extra click\n");
+        return;
+    }
+    sca_starting = true;
     reset_status = 0;
     $.ajax({
         type: "GET",
@@ -69,6 +86,9 @@ function start_sca() {
         dataType: "json",
         success: function(data) {
             reset_status = 2;
+        },
+        complete: function() {
+            sca_starting = false;
         }
     });
     console.log("sca start init\n");
@@ -93,13 +113,7 @@ setInterval(function() {
     if(reset_status!=0){
         UpdateData();
     }
-    //reinit charts
-    var myChart_distance = echarts.init(document.getElementById('chart-distance'), null, {
-        renderer: 'canvas',
-        useDirtyRect: false
-    });
-
-    myChart_distance.setOption({
+    getChart().setOption({
         xAxis: [{
             type: 'category',
             boundaryGap: false,

@@ -13,8 +13,10 @@ function sca_init(){
 function sca_init_one(){
     killall cat
     stty -F /dev/ttyLP4 115200 cs8 -parenb -cstopb raw -echo -echoe -echok -echoctl -echoke
+    echo -e "reset\r\n">/dev/ttyLP4
+    sleep 1
     echo -e "sd op\r\n">/dev/ttyLP4
-    sleep 10
+    sleep 8
 }
 
 function sca_reset(){
